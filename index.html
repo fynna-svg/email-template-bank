@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Email Template Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: workbench — template list | editor | live email preview; stacks to one column under 1180px */
+:root{
+  --bg:#EDF1F6; --panel:#FFFFFF; --ink:#13202E; --muted:#5A6879; --line:#D6DFE9;
+  --accent:#0B2E59; --accent-ink:#FFFFFF; --soft:#E2EBF5; --field:#F7F9FC;
+  --ok:#1D7348; --warn:#9A5600; --bad:#B42318; --stage:#DCE5EF;
+  --font:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D131A; --panel:#151D27; --ink:#E4EBF3; --muted:#93A1B2; --line:#27333F;
+  --accent:#8FB6E8; --accent-ink:#0A1624; --soft:#1C2836; --field:#101820;
+  --ok:#5CC48F; --warn:#E3A048; --bad:#F07A6E; --stage:#0A1016; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D131A; --panel:#151D27; --ink:#E4EBF3; --muted:#93A1B2; --line:#27333F;
+  --accent:#8FB6E8; --accent-ink:#0A1624; --soft:#1C2836; --field:#101820;
+  --ok:#5CC48F; --warn:#E3A048; --bad:#F07A6E; --stage:#0A1016; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--font);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 32px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+h1{font-size:18px;font-weight:600;margin:0;letter-spacing:-.01em}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:14px}
+.pill-sel{display:flex;align-items:center;gap:8px}
+select,input[type=text],input[type=url],input[type=date],input[type=tel],textarea{
+  background:var(--field);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:64px;line-height:1.45}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ai{border-style:dashed}
+.btn.small{padding:4px 9px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:270px minmax(340px,440px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1180px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;min-width:0}
+.panel-h{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.panel-h h2{font-size:13px;font-weight:600;margin:0;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.list{max-height:calc(100vh - 150px);overflow:auto;padding:6px}
+@media (max-width:1180px){.list{max-height:300px}}
+.wk{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:10px 8px 4px}
+.item{display:block;width:100%;text-align:left;border:1px solid transparent;background:none;border-radius:8px;padding:8px 9px}
+.item:hover{background:var(--soft)}
+.item[aria-current="true"]{background:var(--soft);border-color:var(--accent)}
+.item .t{font-weight:500;display:block}
+.item .m{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:3px;font-size:12px;color:var(--muted)}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;border:1px solid currentColor;line-height:1.5}
+.lay{display:inline-block;font-size:11px;padding:1px 6px;border-radius:4px;background:var(--soft);color:var(--ink)}
+.st-Draft{color:var(--muted)} .st-Ready{color:var(--ok)} .st-Scheduled{color:var(--accent)} .st-Sent{color:var(--ink)} .st-Archived{color:var(--muted);opacity:.6}
+.filters{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:2px;padding:6px 8px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:8px 10px;font-weight:500;color:var(--muted);white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.form{padding:12px;display:grid;gap:12px}
+.f label{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:500;margin-bottom:4px}
+.f .cnt{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.f .cnt.over{color:var(--bad)}
+.hint{font-size:12px;color:var(--muted);margin-top:3px}
+.sec{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding-top:6px;border-top:1px solid var(--line)}
+.stats,.rows{display:grid;gap:6px}
+.statrow{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:6px 11px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px;color:var(--muted)}
+.laycard{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:6px;background:var(--field)}
+.imgslot,.acct{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:8px}
+.imgslot .h,.acct .h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.imgslot .thumb{display:flex;gap:10px;align-items:center}
+.imgslot img{width:72px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.accts label,.toggles label{display:inline-flex;align-items:center;gap:5px;margin-right:10px;font-size:13px}
+.link-out{font-family:var(--mono);font-size:11.5px;overflow-wrap:anywhere;color:var(--muted);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.savebar{position:sticky;bottom:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--line);background:var(--panel);border-radius:0 0 12px 12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--warn);display:inline-block}
+.ver{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.pv-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+.subj{padding:10px 12px;border-bottom:1px solid var(--line);display:grid;gap:4px;font-size:13px}
+.subj div{display:flex;gap:8px;align-items:baseline;min-width:0}
+.subj b{flex:0 0 64px;font-weight:500;color:var(--muted)}
+.subj span{min-width:0;overflow-wrap:anywhere;flex:1}
+.stage{background:var(--stage);padding:16px;overflow-x:auto;border-radius:0 0 12px 12px}
+.stage iframe{display:block;margin:0 auto;border:0;background:#EDF3FA;width:600px;max-width:none;height:900px;border-radius:4px}
+.meter{display:grid;gap:4px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.bar{height:6px;border-radius:3px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok)}
+.bar i.warn{background:var(--warn)} .bar i.bad{background:var(--bad)}
+.issues{padding:8px 12px;border-bottom:1px solid var(--line);font-size:12.5px;display:grid;gap:3px}
+.issues .w{color:var(--warn)} .issues .ok{color:var(--ok)}
+.empty{padding:28px 18px;text-align:center;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;font-weight:500;z-index:20;max-width:calc(100vw - 32px)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);padding:0;width:min(620px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(5,12,20,.45)}
+dialog .form{max-height:70vh;overflow:auto}
+.codebox{font:12px/1.4 var(--mono);height:50vh;white-space:pre;background:var(--field)}
+.banner{margin:8px 12px 0;padding:8px 10px;border-radius:8px;background:var(--soft);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+[dir=rtl].f input,[dir=rtl].f textarea,.rtl{direction:rtl;font-family:Tahoma,var(--font)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script src="config.js"></script>
+<script src="vendor/supabase.js"></script>
+<script src="backend.js"></script>
+</head>
+<body>
+
+
+<div class="top">
+  <h1>Email Template Bank</h1>
+  <div class="pill-sel"><label for="projSel" class="muted">Project</label><select id="projSel" style="width:auto"></select></div>
+  <button class="btn small" id="projBtn" type="button">Project settings</button>
+  <button class="btn small" id="acctBtn" type="button">Sending accounts</button>
+  <span style="flex:1"></span>
+  <span id="conn" class="muted" style="font-size:12.5px">Connecting…</span>
+</div>
+
+<div class="grid">
+  <section class="panel" aria-label="Templates">
+    <div class="panel-h"><h2>Templates</h2><span style="flex:1"></span><span id="count" class="muted mono" style="font-size:12px"></span></div>
+    <div class="filters">
+      <input type="text" id="search" placeholder="Search angle or headline" aria-label="Search">
+      <select id="statusFilter" aria-label="Status filter" style="width:118px">
+        <option value="active">All active</option><option>Draft</option><option>Ready</option><option>Scheduled</option><option>Sent</option><option>Archived</option>
+      </select>
+    </div>
+    <div class="list" id="list"><div class="empty">Loading templates…</div></div>
+  </section>
+
+  <section class="panel" aria-label="Editor" id="editor">
+    <div class="empty">Pick a template on the left to edit it.</div>
+  </section>
+
+  <section class="panel" aria-label="Preview" id="previewPanel">
+    <div class="pv-tools">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">English</button><button type="button" data-lang="ar" aria-pressed="false">العربية</button>
+      </div>
+      <select id="acctSel" aria-label="Sending account" style="width:auto"></select>
+      <div class="seg" role="group" aria-label="Preview width">
+        <button type="button" data-w="600" aria-pressed="true">Desktop</button><button type="button" data-w="375" aria-pressed="false">Phone</button>
+      </div>
+      <span style="flex:1"></span>
+      <button class="btn small" type="button" id="codeBtn">View HTML</button>
+      <button class="btn small" type="button" id="copyBtn">Copy HTML</button>
+      <button class="btn small primary" type="button" id="dlBtn">Download .html</button>
+    </div>
+    <div class="subj" id="subj"></div>
+    <div class="meter" id="meter"></div>
+    <div class="issues" id="issues"></div>
+    <div class="stage"><iframe id="pv" title="Email preview" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe></div>
+  </section>
+</div>
+
+<dialog id="acctDlg"><div class="panel-h"><h2>Sending accounts</h2></div><form class="form" id="acctForm" method="dialog"></form>
+  <div class="savebar"><span style="flex:1" class="muted">Applies to every project.</span><button class="btn" type="button" id="acctCancel">Cancel</button><button class="btn primary" type="button" id="acctSave">Save accounts</button></div></dialog>
+<dialog id="projDlg"><div class="panel-h"><h2>Project settings</h2></div><form class="form" id="projForm" method="dialog"></form>
+  <div class="savebar"><span style="flex:1" class="muted">Applies to every template in this project.</span><button class="btn" type="button" id="projCancel">Cancel</button><button class="btn primary" type="button" id="projSave">Save settings</button></div></dialog>
+<dialog id="codeDlg"><div class="panel-h"><h2>Email HTML</h2><span style="flex:1"></span><span class="muted mono" id="codeSize" style="font-size:12px"></span></div>
+  <div class="form"><textarea id="codeBox" class="codebox" readonly aria-label="Email HTML"></textarea></div>
+  <div class="savebar"><span style="flex:1" class="muted">Select all and copy if the Copy button is blocked.</span><button class="btn" type="button" id="codeClose">Close</button></div></dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+// BUILDER-START
+const ACCOUNTS = {
+  MC:  {platform:'Mailchimp',  source:'MC-emiratesrealtygroup',  domain:'emiratesrealtygroup.com'},
+  GR:  {platform:'GetResponse',source:'GR-dubaimainland',        domain:'projects.dubaimainland.community'},
+  ML:  {platform:'MailerLite', source:'ML-dxbdreamhome',          domain:'projects.dxbdreamhome.com'},
+  ML1: {platform:'MailerLite', source:'ML-dubaiexclusiveestates', domain:'projects.dubaiexclusiveestates.com'},
+  GR1: {platform:'GetResponse',source:'GR-eliteresidences',       domain:'projects.eliteresidencesdubai.com'},
+  GR2: {platform:'GetResponse',source:'GR-dubaipremiumedge',      domain:'projects.dubaipremiumedge.com'},
+  MC1: {platform:'Mailchimp',  source:'MC-springluxe',            domain:'projects.springluxefrontier.com'}
+};
+const IMG_SPECS = [
+  {name:'Hero', size:'1200 × 800 px', w:600, ratio:2/3},
+  {name:'Pair, left (1:1)', size:'800 × 800 px', w:280, ratio:1},
+  {name:'Pair, right (1:1)', size:'800 × 800 px', w:280, ratio:1},
+  {name:'Wide', size:'1200 × 600 px', w:600, ratio:1/2}
+];
+const LAYOUTS = {
+  classic:  {short:'Classic', name:'Classic long-form', imgs:[0,1,2,3],
+    hint:'Your proven layout: hero, headline, paragraph, two selling points, stat row, image pair, paragraph, wide image, amenities, two more selling points, ending headline, buttons.',
+    fields:['headline','sub','p1','sp01','stats','p2','p3','sp23','closing']},
+  short:    {short:'Short', name:'Short', imgs:[0],
+    hint:'Hero, eyebrow, headline, stat row, one paragraph, button. Reads in about 10 seconds.',
+    fields:['eyebrow','headline','sub','stats','p1']},
+  offer:    {short:'Offer', name:'Offer-first', imgs:[0],
+    hint:'Opens with the offer in a dark band, then the image, the terms as a stat row and one paragraph.',
+    fields:['offerLabel','offer','offerNote','headline','sub','stats','p1']},
+  brief:    {short:'Brief', name:'Private investment brief', imgs:[0],
+    hint:'A text-led investor note: key figures table, three reasons, one image. Feels like a private memo, not an ad.',
+    fields:['eyebrow','headline','sub','stats','p1','bulletsTitle','bullets']},
+  editorial:{short:'Editorial', name:'Editorial (brochure sections)', imgs:[0],
+    hint:'Brochure style: full-width images, white section cards on a light background, small spaced labels, uppercase headings and square buttons. The intro sits on top; build every section below from blocks (image, small label, heading, paragraph, price rows, payment plan, lists, box pairs, buttons) and use Section break to start a new card.',
+    fields:['eyebrow','headline','sub','p1','highlight']},
+  curiosity:{short:'Curiosity', name:'Curiosity launch', imgs:[0],
+    hint:'A question headline, two lines of copy, and a list of what is only shared on request. The least information, the most reasons to ask.',
+    fields:['eyebrow','headline','p1','bulletsTitle','bullets']}
+};
+const LAYOUT_SECTIONS = {
+  editorial:['hero','eyebrow','headline','sub','p1','highlight','buttons'],
+  classic:['hero','headline','sub','p1','sp01','stats','pair','p2','wide','p3','sp23','closing','buttons'],
+  short:['hero','eyebrow','headline','sub','stats','p1','buttons'],
+  offer:['offer','hero','headline','sub','stats','p1','buttons'],
+  brief:['brief','headline','sub','stats','p1','bullets','hero','buttons'],
+  curiosity:['eyebrow','headline','hero','p1','bullets','buttons']
+};
+const SECTION_LABELS = {highlight:'Highlight line',hero:'Main image',eyebrow:'Eyebrow',headline:'Headline',sub:'Subheadline',p1:'Paragraph 1',sp01:'Selling points 1–2',stats:'Stat row',pair:'Image pair',p2:'Paragraph 2',wide:'Wide image',p3:'Amenities',sp23:'Selling points 3–4',closing:'Ending headline',buttons:'Buttons',offer:'Offer band',bullets:'List',brief:'Brief header'};
+function secLabel(k,layout){return (layout==='brief'&&k==='stats')?'Key figures':SECTION_LABELS[k]||k}
+const BLOCK_TYPES = {eyebrow:'Small label',heading:'Heading',paragraph:'Paragraph',text:'Small text',callout:'Highlight box',pair:'Box pair',list:'Bullet list',rows:'Price rows',plan:'Payment plan rows',button:'Button',buttons:'Main buttons again',image:'Image',divider:'Divider',spacer:'Spacer',break:'Section break'};
+/* Brochure starter: the section structure of the brochure template, with sample text to overwrite */
+function edStarter(){
+  const B=(type,en,x)=>Object.assign({type,pos:'auto',en:en||{},ar:{}},x||{});
+  return [
+    B('button',{label:'Register for priority access'},{pos:'after:highlight',link:'main',style:'dark'}),
+    B('image',{},{shape:'full'}),
+    B('eyebrow',{text:'Villas'}),
+    B('heading',{text:'4 & 5-bedroom villas'}),
+    B('paragraph',{text:'One or two lines on what makes this home type worth asking about.'},{readMore:false}),
+    B('rows',{text:'4-bedroom villa · plot size | From AED X.XM\n5-bedroom villa · plot size | From AED X.XM'}),
+    B('button',{label:'Get villa prices'},{link:'whatsapp',style:'dark'}),
+    B('break',{},{bg:'white'}),
+    B('image',{},{shape:'full'}),
+    B('eyebrow',{text:'Townhouses'}),
+    B('heading',{text:'3 & 4-bedroom townhouses'}),
+    B('paragraph',{text:'One or two lines on the townhouses.'},{readMore:false}),
+    B('rows',{text:'3-bedroom · size | From AED X.XM\n4-bedroom · size | From AED X.XM'}),
+    B('button',{label:'Get floor plans'},{link:'whatsapp',style:'dark'}),
+    B('break',{},{bg:'blue'}),
+    B('image',{},{shape:'full'}),
+    B('eyebrow',{text:'Amenities'}),
+    B('heading',{text:'Everything within the community'}),
+    B('paragraph',{text:'A short line on the lifestyle and amenities.'},{readMore:false}),
+    B('pair',{a:'Central park / Trails and play areas',b:'Two lifestyle clubs / Pools, courts and gym'},{style:'sp'}),
+    B('list',{title:'The park',text:'Landscaped walking paths\nPlay parks\nNature centre'}),
+    B('break',{},{bg:'white'}),
+    B('image',{},{shape:'full'}),
+    B('eyebrow',{text:'Why now'}),
+    B('heading',{text:'What the neighbouring communities did'}),
+    B('list',{title:'Appreciation potential',text:'A sourced price-growth fact for a nearby community*\nA second sourced fact\nPlot size or density compared with similar areas'}),
+    B('pair',{a:'Past growth nearby*',b:'Larger plots, similar price per sq ft'},{style:'callout'}),
+    B('button',{label:'Ask about the launch'},{link:'whatsapp',style:'dark'}),
+    B('break',{},{bg:'blue'}),
+    B('plan',{title:'Payment plan',text:'10% | On booking | Down payment\n50% | During construction | Instalments\n40% | On handover | Handover date'}),
+    B('break',{},{bg:'white'}),
+    B('image',{},{shape:'full'}),
+    B('eyebrow',{text:'Location'}),
+    B('heading',{text:'Minutes from the main roads'}),
+    B('paragraph',{text:'Where it sits and what is nearby.'},{readMore:false}),
+    B('rows',{text:'14 min | Landmark one\n20 min | Landmark two\n25 min | Landmark three'}),
+    B('button',{label:'View the location map'},{link:'landing',style:'dark'}),
+    B('break',{},{bg:'blue'}),
+    B('eyebrow',{text:'Launching soon'}),
+    B('heading',{text:'Closing headline'}),
+    B('paragraph',{text:'A last line on why to register now.'},{readMore:false})
+  ];
+}
+function templateBlocks(t){return Array.isArray(t.blocks)?t.blocks:(t.extraImages||[]).map(im=>Object.assign({type:'image'},im||{}))}
+const TXT = {
+  en:{readMore:'Read more...', offerLabel:'Launch offer', brief:'Private investment brief', onReq:'On request', cta2:'Chat on WhatsApp',
+      bulletsBrief:'Why buyers are looking now', bulletsCur:'Shared on WhatsApp only',
+      unsub:'Unsubscribe', prefs:'Manage preferences', priv:'Privacy policy', why:"You're receiving this email because you subscribed to UAE property updates."},
+  ar:{readMore:'اقرأ المزيد...', offerLabel:'عرض الإطلاق', brief:'موجز استثماري خاص', onReq:'عند الطلب', cta2:'تواصل عبر واتساب',
+      bulletsBrief:'لماذا يتجه المشترون إليه الآن', bulletsCur:'نشاركها عبر واتساب فقط',
+      unsub:'إلغاء الاشتراك', prefs:'تعديل التفضيلات', priv:'سياسة الخصوصية', why:'وصلتك هذه الرسالة لأنك مشترك في قائمتنا البريدية لتحديثات العقارات في الإمارات.'}
+};
+const DEFAULT_WA = 'https://wa.me/{number}?text={message}%20(Ref%20-%20{code}%20{acct})&utm_source={source}&utm_medium=email&utm_campaign={code}';
+function waMessage(p,t,lang){
+  const ar=lang==='ar';
+  const own=ar?(t.waTextAr||''):(t.waTextEn||'');
+  const proj=ar?(p.waTextAr||p.waTextEn||''):(p.waTextEn||'');
+  return own||proj||('Please send me more details about '+(p.name||'this project'));
+}
+const DEFAULT_LANDING = 'https://{domain}/{path}?utm_source={source}&utm_medium=email&utm_campaign={code}&utm_content={acct}';
+const ACCOUNT_DEFAULTS = JSON.parse(JSON.stringify(ACCOUNTS));
+function applyAccountSettings(s){
+  Object.keys(ACCOUNT_DEFAULTS).forEach(k=>{ACCOUNTS[k]=Object.assign({},ACCOUNT_DEFAULTS[k],((s||{}).accounts||{})[k]||{})});
+}
+const IMG_HOSTS = {Mailchimp:/(mcusercontent\.com|list-manage\.com|mailchimp)/i, GetResponse:/(gr-cdn\.com|getresponse)/i, MailerLite:/(mlcdn\.com|mailerlite)/i};
+function imgUrlFor(im,acct){return ((im&&im.urls)||{})[acct]||(im&&im.url)||''}
+function imgHostOk(url,acct){const plat=(ACCOUNTS[acct]||{}).platform;if(!url||!IMG_HOSTS[plat])return true;return IMG_HOSTS[plat].test(url)}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function yymmdd(d){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||'');return m?m[1].slice(2)+m[2]+m[3]:''}
+function fillTokens(pattern,vals,raw){return String(pattern).replace(/\{(\w+)\}/g,(m,k)=>k in vals?(raw.includes(k)?String(vals[k]):encodeURIComponent(vals[k])):m)}
+function campaignCode(p,t){
+  if(t.codeOverride) return t.codeOverride;
+  return fillTokens(p.codePattern||'{project}-{date}',{project:p.code||'P0000',date:yymmdd(t.sendDate)||'YYMMDD'},['project','date']);
+}
+function tokenVals(p,t,acct,lang){
+  const a=ACCOUNTS[acct]||{};
+  return {message:waMessage(p,t,lang),code:campaignCode(p,t),acct,source:((p.landingSources||{})[acct])||a.source||acct,domain:a.domain||'',path:String(p.landingPath||'').replace(/^\/+/,''),
+    number:String(p.whatsappNumber||'').replace(/[^\d]/g,'')||'971XXXXXXXXX',project:p.code||'',name:p.name||'',date:yymmdd(t.sendDate),layout:(LAYOUTS[t.layout]||LAYOUTS.classic).short};
+}
+const LANDING_UTM='utm_source={source}&utm_medium=email&utm_campaign={code}&utm_content={acct}';
+function cleanLandingBase(u){u=String(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u.replace(/^\/+/,'');return u.split('#')[0].split('?')[0]}
+function landingUrl(p,t,acct){ const a=ACCOUNTS[acct]||{}; const lu=p.landingUrls||{};
+  if(Object.prototype.hasOwnProperty.call(lu,acct)){ const base=cleanLandingBase(lu[acct]); if(!base) return ''; return base+'?'+fillTokens(LANDING_UTM,tokenVals(p,t,acct),[]); }
+  if(!p.landingPath||a.landing===false||!a.domain) return ''; const pat=(!p.landingPattern||p.landingPattern===OLD_LANDING)?DEFAULT_LANDING:p.landingPattern; return fillTokens(pat,tokenVals(p,t,acct),['domain','path']); }
+const OLD_LANDING='https://{domain}/{path}?utm_source={source}&utm_content={acct}&utm_campaign={code}';
+function waUrl(p,t,acct,lang){
+  const pat=(lang==='ar'&&p.waPatternAr)||p.waPattern||(p.whatsappNumber?DEFAULT_WA:'');
+  if(!pat) return '';
+  return fillTokens(pat.replace('utm_source={acct}','utm_source={source}'),tokenVals(p,t,acct,lang),['number']);
+}
+function resolveLinks(p,t,acct,lang){
+  const L=t.useLanding===false?'':landingUrl(p,t,acct);
+  const W=t.useWhatsapp===false?'':waUrl(p,t,acct,lang);
+  const main=L||W||'#', side=W||L||'#';
+  return {L,W,main,side,both:!!(L&&W),code:campaignCode(p,t)};
+}
+function subjectFor(t,acct,lang){
+  const a=((t.acctCopy||{})[acct]||{})[lang]||{}, c=t[lang]||{};
+  return {subject:a.subject||(t.subjectPick==2?c.subject2:c.subject1)||'', preview:a.preview||c.preview||''};
+}
+function footerHtml(p,acct,lang,F){
+  const plat=(ACCOUNTS[acct]||{}).platform, X=TXT[lang], ls='color:#8A96A3;text-decoration:underline;';
+  let company,address,unsub,prefs='';
+  if(plat==='Mailchimp'){company='*|LIST:COMPANY|*';address='*|LIST:ADDRESS|*';unsub='*|UNSUB|*';prefs='*|UPDATE_PROFILE|*';}
+  else if(plat==='MailerLite'){company='{$company_name}';address='{$company_address}';unsub='{$unsubscribe}';}
+  else {company=esc(p.grCompany||'[Company name]');address=esc(p.grAddress||'[Company address]');unsub='[[unsubscribe]]';}
+  const links=['<a href="'+unsub+'" style="'+ls+'">'+X.unsub+'</a>'];
+  if(prefs) links.push('<a href="'+prefs+'" style="'+ls+'">'+X.prefs+'</a>');
+  if(p.privacyUrl) links.push('<a href="'+esc(p.privacyUrl)+'" target="_blank" style="'+ls+'">'+X.priv+'</a>');
+  return '<tr><td align="center" style="padding:20px 24px 8px;font-family:'+F+';font-size:11px;line-height:17px;color:#8A96A3;">'+X.why+'<br>'+company+' &middot; '+address+'</td></tr>'+
+    '<tr><td align="center" style="padding:0 24px 28px;font-family:'+F+';font-size:11px;line-height:17px;color:#8A96A3;">'+links.join(' &nbsp;&middot;&nbsp; ')+'</td></tr>';
+}
+function buildEmail(t,p,lang,acct,mode){
+  const preview=mode==='preview', ar=lang==='ar', X=TXT[lang];
+  const c=t[lang]||{}, layout=LAYOUTS[t.layout]?t.layout:'classic';
+  const ED=layout==='editorial', BLUE='#5B8DB8', INK='#1E2A35', HAIR='#DCE6F1';
+  const F=ar?'Tahoma,Arial,sans-serif':(ED?"Montserrat,'Helvetica Neue',Arial,sans-serif":'Arial,Helvetica,sans-serif');
+  const FH=layout==='brief'?(ar?'Tahoma,Arial,sans-serif':'Georgia,Times New Roman,serif'):F;
+  const dir=ar?'rtl':'ltr', START=ar?'right':'left', END=ar?'left':'right';
+  const lk=resolveLinks(p,t,acct,lang), M=esc(lk.main), S=esc(lk.side);
+  const sp=subjectFor(t,acct,lang);
+  const imgs=t.images||[];
+  const cta2=c.cta2||((p.cta2||{})[lang])||X.cta2;
+  function renderImg(im,w,ratio,label,size){
+    im=im||{};
+    const src=preview?(im.previewUrl||imgUrlFor(im,acct)):imgUrlFor(im,acct);
+    if(!src){
+      if(!preview) return '';
+      return '<div style="width:100%;height:'+Math.round(w*ratio*0.6)+'px;background:#D9E4F0;border-radius:'+(ED?0:8)+'px;font-family:Arial,sans-serif;font-size:13px;color:#4A5B6E;display:flex;align-items:center;justify-content:center;text-align:center;">'+label+'<br>'+size+'</div>';
+    }
+    return '<a href="'+S+'" target="_blank" style="text-decoration:none;"><img src="'+esc(src)+'" width="'+w+'" alt="'+esc((ar?im.altAr:im.altEn)||'')+'" style="display:block;width:100%;max-width:'+w+'px;height:auto;border:0;border-radius:'+(ED?0:8)+'px;outline:none;"></a>';
+  }
+  function img(i){const spec=IMG_SPECS[i];return renderImg(imgs[i],spec.w,spec.ratio,'Image '+(i+1)+' &middot; '+spec.name,spec.size)}
+  function imgGroup(xs){
+    xs=xs.filter(x=>preview||imgUrlFor(x.b,acct));
+    let out='';
+    for(let k=0;k<xs.length;k++){
+      const x=xs[k], half=x.b.shape==='half';
+      const lbl='Extra image '+x.n;
+      if(half){
+        const y=xs[k+1]&&xs[k+1].b.shape==='half'?xs[k+1]:null;
+        const a=renderImg(x.b,280,1,lbl+' &middot; half width','800 × 800 px'), b=y?renderImg(y.b,280,1,'Extra image '+y.n+' &middot; half width','800 × 800 px'):'';
+        out+='<tr><td class="px" style="padding:4px 18px 22px;"><table role="presentation" '+(y?'width="100%"':'align="center"')+' cellpadding="0" cellspacing="0" border="0"><tr><td class="col" '+(y?'width="50%"':'width="280"')+' valign="top" style="padding:0 6px;">'+a+'</td>'+(y?'<td class="col" width="50%" valign="top" style="padding:0 6px;">'+b+'</td>':'')+'</tr></table></td></tr>';
+        if(y)k++;
+      } else out+=ED?'<tr><td style="padding:0;">'+renderImg(x.b,600,2/3,lbl+' &middot; full width','1200 px wide')+'</td></tr><tr><td style="font-size:0;line-height:0;height:34px;">&nbsp;</td></tr>':'<tr><td class="px" style="padding:4px 24px 22px;">'+renderImg(x.b,600,2/3,lbl+' &middot; full width','1200 px wide')+'</td></tr>';
+    }
+    return out;
+  }
+  const imgRow=(i,pad)=>{const h=img(i);if(!h)return '';return ED?'<tr><td style="padding:0;">'+h+'</td></tr><tr><td style="font-size:0;line-height:0;height:38px;">&nbsp;</td></tr>':'<tr><td class="px" style="padding:'+(pad||'4px 24px 22px')+';">'+h+'</td></tr>'};
+  const align=(layout==='brief'||ED)?START:'center';
+  const PFS=ED?'13px':'16px', PLH=ED?'22px':'26px', PCOL=ED?'#333333':'#222222';
+  const ls=v=>ar?'0':v;
+  const px=layout==='brief'?'40px':'40px';
+  const nl=s=>esc(s).replace(/\n/g,'<br>');
+  const para=(txt)=>txt?'<tr><td align="'+align+'" class="px" style="padding:4px '+px+' 18px;font-family:'+F+';font-size:'+PFS+';line-height:'+PLH+';color:'+PCOL+';">'+nl(txt)+' <a href="'+M+'" target="_blank" style="color:'+(ED?BLUE:'#0B2E59')+';font-weight:bold;text-decoration:underline;">'+X.readMore+'</a></td></tr>':'';
+  const plainPara=(txt)=>'<tr><td align="'+align+'" class="px" style="padding:4px '+px+' 18px;font-family:'+F+';font-size:'+PFS+';line-height:'+PLH+';color:'+PCOL+';">'+nl(txt)+'</td></tr>';
+  const smallHead=(txt)=>'<tr><td align="'+START+'" class="px" style="padding:6px 40px 8px;font-family:'+F+';font-size:11px;line-height:16px;letter-spacing:'+ls('1px')+';font-weight:bold;color:'+(ED?BLUE:'#0B2E59')+';text-transform:uppercase;">'+esc(txt)+'</td></tr>';
+  const lines=txt=>String(txt||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  function blockLink(b){
+    if(b.link==='whatsapp') return esc(lk.W||lk.main);
+    if(b.link==='landing') return esc(lk.L||lk.main);
+    if(b.link==='custom') return esc(b.url||'#');
+    return M;
+  }
+  function blockHtml(b,j){
+    const bc=b[lang]||{}, txt=String(bc.text||'').trim();
+    const ph=what=>preview?'<tr><td class="px" style="padding:4px 24px 18px;"><div style="border:1px dashed #9DB9DA;border-radius:8px;padding:12px;font-family:Arial,sans-serif;font-size:13px;line-height:18px;color:#4A5B6E;text-align:center;">Block '+(j+1)+' &middot; '+what+' is empty in '+(ar?'Arabic':'English')+'. It is left out of the export.</div></td></tr>':'';
+    switch(b.type){
+      case 'heading': return txt?(ED?'<tr><td align="'+START+'" class="px" style="padding:0 40px 14px;font-family:'+F+';font-size:19px;line-height:27px;letter-spacing:'+ls('0.5px')+';font-weight:normal;color:'+INK+';text-transform:uppercase;">'+nl(txt)+'</td></tr>':'<tr><td align="'+align+'" class="px" style="padding:8px 40px 10px;font-family:'+FH+';font-size:22px;line-height:30px;font-weight:bold;color:#000000;">'+nl(txt)+'</td></tr>'):ph('Heading');
+      case 'eyebrow': return txt?'<tr><td align="'+(ED?START:align)+'" class="px" style="padding:'+(ED?'0 40px 12px':'6px 40px 8px')+';font-family:'+F+';font-size:10px;line-height:14px;letter-spacing:'+ls('3px')+';color:#8FA3B5;text-transform:uppercase;">'+esc(txt)+'</td></tr>':ph('Small label');
+      case 'rows': {
+        const rs=lines(txt).map(x=>x.split('|').map(y=>y.trim()));
+        if(!rs.length) return ph('Price rows');
+        return (bc.title?smallHead(bc.title):'')+'<tr><td class="px" style="padding:4px 40px 26px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid '+HAIR+';">'+
+          rs.map(r=>'<tr><td align="'+START+'" style="padding:11px 0;border-bottom:1px solid '+HAIR+';font-family:'+F+';font-size:11px;line-height:16px;letter-spacing:'+ls('1px')+';color:'+INK+';text-transform:uppercase;">'+esc(r[0])+'</td><td align="'+END+'" style="padding:11px 0;border-bottom:1px solid '+HAIR+';font-family:'+F+';font-size:11px;line-height:16px;letter-spacing:'+ls('1px')+';font-weight:bold;color:'+BLUE+';white-space:nowrap;">'+sv(r[1]||'')+'</td></tr>').join('')+'</table></td></tr>';
+      }
+      case 'plan': {
+        const rs=lines(txt).map(x=>x.split('|').map(y=>y.trim()));
+        if(!rs.length) return ph('Payment plan rows');
+        return (bc.title?smallHead(bc.title):'')+'<tr><td class="px" style="padding:2px 40px 26px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid '+HAIR+';">'+
+          rs.map(r=>'<tr><td width="64" valign="middle" align="'+START+'" style="padding:14px 0;border-bottom:1px solid '+HAIR+';font-family:'+F+';font-size:19px;line-height:24px;color:'+BLUE+';white-space:nowrap;">'+sv(r[0])+'</td><td align="'+START+'" style="padding:14px 0;border-bottom:1px solid '+HAIR+';font-family:'+F+';"><div style="font-size:11px;line-height:16px;letter-spacing:'+ls('1px')+';font-weight:bold;color:'+INK+';text-transform:uppercase;">'+esc(r[1]||'')+'</div>'+(r[2]?'<div style="font-size:11px;line-height:16px;color:#5A6879;padding-top:2px;">'+esc(r[2])+'</div>':'')+'</td></tr>').join('')+'</table></td></tr>';
+      }
+      case 'pair': {
+        const a=String(bc.a||'').trim(), b2=String(bc.b||'').trim();
+        if(!a&&!b2) return ph('Box pair');
+        if(b.style!=='callout') return spPair(a,b2);
+        const box=v=>'<td class="col" width="50%" valign="top" style="padding:0 6px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F4F8FC;border-radius:'+(ED?0:12)+'px;border-'+START+':4px solid '+(ED?BLUE:'#0B2E59')+';"><tr><td align="'+START+'" style="padding:16px 18px;font-family:'+F+';font-size:'+(ED?'13px':'16px')+';line-height:'+(ED?'20px':'24px')+';font-weight:bold;color:#000000;">'+nl(v)+'</td></tr></table></td>';
+        return '<tr><td class="px" style="padding:4px 18px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+[a,b2].filter(Boolean).map(box).join('')+'</tr></table></td></tr>';
+      }
+      case 'break': {
+        const blue=b.bg==='blue';
+        return '</table><div style="font-size:0;line-height:0;height:'+(b.size==='small'?14:28)+'px;">&nbsp;</div><table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;'+(blue?'':'background:#FFFFFF;')+'border-radius:'+(ED?0:14)+'px;">'+(b._flush?'':'<tr><td style="font-size:0;line-height:0;height:'+(blue?10:34)+'px;">&nbsp;</td></tr>');
+      }
+      case 'paragraph': return txt?(b.readMore===false?plainPara(txt):para(txt)):ph('Paragraph');
+      case 'text': return txt?'<tr><td align="'+align+'" class="px" style="padding:0 40px 16px;font-family:'+F+';font-size:13px;line-height:20px;color:#555555;">'+nl(txt)+'</td></tr>':ph('Small text');
+      case 'callout': return txt?'<tr><td class="px" style="padding:4px 24px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F4F8FC;border-radius:12px;border-'+START+':4px solid #0B2E59;"><tr><td align="'+align+'" style="padding:18px 22px;font-family:'+F+';font-size:17px;line-height:26px;font-weight:bold;color:#000000;">'+nl(txt)+'</td></tr></table></td></tr>':ph('Highlight box');
+      case 'list': {
+        const items=txt.split('\n').map(x=>x.replace(/^[-•·]\s*/,'').trim()).filter(Boolean);
+        if(!items.length) return ph('Bullet list');
+        if(ED) return (bc.title?smallHead(bc.title):'')+'<tr><td class="px" style="padding:0 40px 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'+
+          items.map(x=>'<tr><td width="14" valign="top" style="font-family:'+F+';font-size:12px;line-height:20px;color:'+BLUE+';">&middot;</td><td align="'+START+'" style="font-family:'+F+';font-size:12px;line-height:20px;color:'+PCOL+';">'+esc(x)+'</td></tr>').join('')+'</table></td></tr>';
+        return (bc.title?smallHead(bc.title):'')+'<tr><td class="px" style="padding:0 40px 18px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'+
+          items.map(x=>'<tr><td width="20" valign="top" style="padding:10px 0 0;"><div style="width:7px;height:7px;background:#0B2E59;border-radius:4px;font-size:0;line-height:0;">&nbsp;</div></td><td align="'+START+'" style="padding:3px 0 7px;font-family:'+F+';font-size:16px;line-height:24px;color:#222222;">'+esc(x)+'</td></tr>').join('')+'</table></td></tr>';
+      }
+      case 'button': {
+        const label=String(bc.label||'').trim();
+        if(!label) return ph('Button');
+        return ED?'<tr><td align="'+START+'" class="px" style="padding:8px 40px 38px;">'+pill(label,blockLink(b),b.style!=='light')+'</td></tr>':'<tr><td align="center" class="px" style="padding:6px 24px 22px;">'+pill(label,blockLink(b),b.style!=='light')+'</td></tr>';
+      }
+      case 'buttons': return buttons();
+      case 'divider': return '<tr><td class="px" style="padding:6px 40px 22px;"><div style="height:1px;line-height:1px;font-size:0;background:#DCE6F1;">&nbsp;</div></td></tr>';
+      case 'spacer': {const h=b.size==='large'?40:b.size==='small'?12:24;return '<tr><td style="font-size:0;line-height:0;height:'+h+'px;">&nbsp;</td></tr>'}
+    }
+    return '';
+  }
+  function groupHtml(list){
+    let out='',run=[];
+    const flush=()=>{if(run.length){out+=imgGroup(run);run=[]}};
+    list.forEach((x,i)=>{if(x.b.type==='image')run.push(x);else{flush();const nx=list[i+1];out+=blockHtml(x.b.type==='break'&&nx&&nx.b.type==='image'?Object.assign({},x.b,{_flush:1}):x.b,x.j)}});
+    flush();return out;
+  }
+  const eyebrow=()=>c.eyebrow?(ED?'<tr><td align="'+START+'" class="px" style="padding:0 40px 12px;font-family:'+F+';font-size:10px;line-height:14px;letter-spacing:'+ls('3px')+';color:#8FA3B5;text-transform:uppercase;">'+esc(c.eyebrow)+'</td></tr>':'<tr><td align="center" class="px" style="padding:20px 40px 6px;font-family:'+F+';font-size:12px;line-height:16px;letter-spacing:'+(ar?'0':'2px')+';font-weight:bold;color:#4A5B6E;text-transform:uppercase;">'+esc(c.eyebrow)+'</td></tr>'):'';
+  const headline=(size,top)=>!c.headline?'':ED?'<tr><td align="'+START+'" class="px h1" style="padding:0 40px 10px;font-family:'+F+';font-size:22px;line-height:30px;letter-spacing:'+ls('0.5px')+';font-weight:normal;color:'+INK+';text-transform:uppercase;">'+esc(c.headline)+'</td></tr>':c.headline?'<tr><td align="'+align+'" class="px h1" style="padding:'+(top||'6px')+' 40px 8px;font-family:'+FH+';font-size:'+size+'px;line-height:'+(size+8)+'px;font-weight:bold;color:#000000;">'+esc(c.headline)+'</td></tr>':'';
+  const highlight=()=>c.highlight?'<tr><td align="'+START+'" class="px" style="padding:6px 40px 22px;font-family:'+F+';font-size:16px;line-height:24px;letter-spacing:'+ls('0.5px')+';color:'+BLUE+';text-transform:uppercase;"><a href="'+M+'" target="_blank" style="color:'+BLUE+';text-decoration:none;">'+esc(c.highlight)+'</a></td></tr>':'';
+  const sub=()=>!c.sub?'':ED?'<tr><td align="'+START+'" class="px" style="padding:0 40px 18px;font-family:'+F+';font-size:11px;line-height:17px;letter-spacing:'+ls('2.5px')+';color:'+BLUE+';text-transform:uppercase;">'+esc(c.sub)+'<div style="width:40px;height:1px;line-height:1px;font-size:0;background:'+BLUE+';margin-top:18px;">&nbsp;</div></td></tr>':c.sub?'<tr><td align="'+align+'" class="px" style="padding:0 40px 22px;font-family:'+F+';font-size:17px;line-height:26px;"><a href="'+M+'" target="_blank" style="color:#0B2E59;text-decoration:none;">'+esc(c.sub)+'</a></td></tr>':'';
+  const stats=(c.stats||[]).filter(s=>s&&(s.v||s.l));
+  const sv=v=>ar&&/\d\s*[–-]\s*\d/.test(v||'')?'<span dir="ltr" style="unicode-bidi:embed;">'+esc(v)+'</span>':esc(v);
+  function statRow(){
+    if(!stats.length) return '';
+    const w=Math.floor(100/stats.length);
+    return '<tr><td class="px" style="padding:6px 24px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F4F8FC;border-radius:12px;"><tr>'+
+      stats.map((s,i)=>'<td class="stat'+(i?' stat-n':'')+'" width="'+w+'%" align="center" valign="top" style="padding:20px 10px;'+(i?'border-'+START+':1px solid #DCE6F1;':'')+'"><div style="font-family:'+F+';font-size:26px;line-height:30px;font-weight:bold;color:#000000;white-space:nowrap;">'+sv(s.v)+'</div><div style="font-family:'+F+';font-size:13px;line-height:18px;color:#444444;padding-top:6px;">'+esc(s.l)+'</div></td>').join('')+
+      '</tr></table></td></tr>';
+  }
+  function figures(){
+    if(!stats.length) return '';
+    return '<tr><td class="px" style="padding:6px 40px 20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'+
+      stats.map(s=>'<tr><td align="'+START+'" style="padding:12px 0;border-bottom:1px solid #DCE6F1;font-family:'+F+';font-size:14px;line-height:20px;color:#444444;">'+esc(s.l)+'</td><td align="'+END+'" style="padding:12px 0;border-bottom:1px solid #DCE6F1;font-family:'+F+';font-size:19px;line-height:22px;font-weight:bold;color:#000000;white-space:nowrap;">'+sv(s.v)+'</td></tr>').join('')+
+      '</table></td></tr>';
+  }
+  function spBox(s){const parts=String(s||'').split(/\s*\/\s*/);return parts.map(x=>'<span style="white-space:nowrap;">'+esc(x)+'</span>').join('<br>')}
+  function spPair(a,b){
+    const box=s=>'<td class="col" width="50%" valign="top" style="padding:0 6px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" valign="middle" height="96" style="height:96px;background:#F4F8FC;border-radius:12px;padding:0 12px;font-family:'+F+';font-size:17px;line-height:24px;font-weight:bold;color:#000000;">'+spBox(s)+'</td></tr></table></td>';
+    const list=[a,b].filter(Boolean);
+    if(!list.length) return '';
+    if(ED){
+      const edBox=s=>{const pr=String(s).split(/\s+\/\s+|\n/);return '<td class="col" width="50%" valign="top" style="padding:0 6px 10px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FFFFFF;border:1px solid '+HAIR+';"><tr><td align="'+START+'" valign="top" style="padding:18px 18px 16px;font-family:'+F+';"><div style="font-size:11px;line-height:16px;letter-spacing:'+ls('1.5px')+';font-weight:bold;color:'+BLUE+';text-transform:uppercase;">'+esc(pr[0])+'</div>'+(pr[1]?'<div style="font-size:13px;line-height:20px;color:'+INK+';padding-top:6px;">'+esc(pr.slice(1).join(' '))+'</div>':'')+'</td></tr></table></td>'};
+      return '<tr><td class="px" style="padding:4px 34px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+list.map(edBox).join('')+'</tr></table></td></tr>';
+    }
+    return '<tr><td class="px" style="padding:4px 18px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+list.map(box).join('')+'</tr></table></td></tr>';
+  }
+  function amenities(txt){
+    if(!txt) return '';
+    const lines=txt.split('\n').map(x=>x.trim()).filter(Boolean);
+    const items=lines.filter(x=>/^[-•]/.test(x)).map(x=>x.replace(/^[-•]\s*/,''));
+    if(items.length<2) return para(txt);
+    const head=lines.find(x=>!/^[-•]/.test(x));
+    const half=Math.ceil(items.length/2);
+    const col=arr=>'<td class="col" width="50%" valign="top" style="padding:0 10px;">'+arr.map(x=>'<div style="font-family:'+F+';font-size:15px;line-height:22px;color:#222222;padding:5px 0;">&bull;&nbsp;'+esc(x)+'</div>').join('')+'</td>';
+    return (head?'<tr><td align="center" class="px" style="padding:4px 40px 10px;font-family:'+F+';font-size:19px;line-height:26px;font-weight:bold;color:#000000;">'+esc(head)+'</td></tr>':'')+
+      '<tr><td class="px" style="padding:0 40px 20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F4F8FC;border-radius:12px;"><tr><td style="padding:14px 8px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+col(items.slice(0,half))+col(items.slice(half))+'</tr></table></td></tr></table></td></tr>';
+  }
+  const closing=()=>c.closing?'<tr><td align="center" class="px" style="padding:8px 40px 18px;font-family:'+F+';font-size:24px;line-height:32px;font-weight:bold;"><a href="'+M+'" target="_blank" style="color:#000000;text-decoration:none;">'+esc(c.closing)+'</a></td></tr>':'';
+  function pill(label,href,dark){
+    if(ED) return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="'+START+'"><tr><td align="center" bgcolor="'+(dark?BLUE:'#EAF2F9')+'"><a href="'+href+'" target="_blank" style="display:inline-block;padding:13px 28px;font-family:'+F+';font-size:10px;line-height:14px;letter-spacing:'+ls('2.5px')+';font-weight:bold;color:'+(dark?'#FFFFFF':BLUE)+';text-decoration:none;text-transform:uppercase;white-space:nowrap;">'+esc(label)+'</a></td></tr></table>';
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td align="center" bgcolor="'+(dark?'#0B2E59':'#D6E4F2')+'" style="border-radius:50px;"><a href="'+href+'" target="_blank" style="display:inline-block;padding:15px 30px;font-family:'+F+';font-size:16px;line-height:20px;font-weight:bold;color:'+(dark?'#FFFFFF':'#0B2E59')+';text-decoration:none;border-radius:50px;white-space:nowrap;">'+esc(label)+'</a></td></tr></table>';
+  }
+  function buttons(){
+    if(!c.cta) return '';
+    if(lk.both) return '<tr><td align="'+(ED?START:'center')+'" class="px" style="padding:'+(ED?'8px 34px 38px':'6px 24px 26px')+';"><table role="presentation" cellpadding="0" cellspacing="0" border="0" align="'+(ED?START:'center')+'"><tr><td class="col btnc" style="padding:0 6px;">'+pill(cta2,esc(lk.W),false)+'</td><td class="col btnc" style="padding:0 6px;">'+pill(c.cta,esc(lk.L),true)+'</td></tr></table></td></tr>';
+    return ED?'<tr><td align="'+START+'" class="px" style="padding:8px 40px 38px;">'+pill(c.cta,M,true)+'</td></tr>':'<tr><td align="center" style="padding:6px 24px 26px;">'+pill(c.cta,M,true)+'</td></tr>';
+  }
+  function bulletList(kind){
+    const items=(c.bullets||[]).filter(Boolean); if(!items.length) return '';
+    const title=c.bulletsTitle||(kind==='brief'?X.bulletsBrief:X.bulletsCur);
+    if(kind==='brief'){
+      return '<tr><td align="'+START+'" class="px" style="padding:6px 40px 6px;font-family:'+F+';font-size:13px;line-height:18px;letter-spacing:'+(ar?'0':'1.5px')+';font-weight:bold;color:#0B2E59;text-transform:uppercase;">'+esc(title)+'</td></tr>'+
+        '<tr><td class="px" style="padding:0 40px 20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'+
+        items.map(x=>'<tr><td width="20" valign="top" style="padding:9px 0 0;"><div style="width:8px;height:8px;background:#0B2E59;font-size:0;line-height:0;">&nbsp;</div></td><td align="'+START+'" style="padding:4px 0 8px;font-family:'+F+';font-size:16px;line-height:24px;color:#222222;">'+esc(x)+'</td></tr>').join('')+'</table></td></tr>';
+    }
+    return '<tr><td class="px" style="padding:4px 24px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F4F8FC;border-radius:12px;"><tr><td style="padding:18px 20px 8px;font-family:'+F+';font-size:13px;line-height:18px;letter-spacing:'+(ar?'0':'1.5px')+';font-weight:bold;color:#0B2E59;text-transform:uppercase;" align="center">'+esc(title)+'</td></tr>'+
+      items.map(x=>'<tr><td style="padding:0 20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="'+START+'" style="padding:12px 0;border-top:1px solid #DCE6F1;font-family:'+F+';font-size:16px;line-height:22px;color:#000000;">'+esc(x)+'</td><td align="'+END+'" width="96" style="padding:12px 0;border-top:1px solid #DCE6F1;"><a href="'+S+'" target="_blank" style="display:inline-block;font-family:'+F+';font-size:12px;line-height:16px;font-weight:bold;color:#0B2E59;border:1px solid #0B2E59;border-radius:50px;padding:4px 10px;text-decoration:none;white-space:nowrap;">'+X.onReq+'</a></td></tr></table></td></tr>').join('')+
+      '<tr><td style="font-size:0;line-height:0;padding-bottom:10px;">&nbsp;</td></tr></table></td></tr>';
+  }
+  function offerBand(){
+    if(!c.offer) return '';
+    return '<tr><td align="center" style="background:#0B2E59;border-radius:14px 14px 0 0;padding:26px 32px 22px;"><div style="font-family:'+F+';font-size:12px;line-height:16px;letter-spacing:'+(ar?'0':'2px')+';font-weight:bold;color:#9DB9DA;text-transform:uppercase;">'+esc(c.offerLabel||X.offerLabel)+'</div>'+
+      '<div style="font-family:'+F+';font-size:27px;line-height:35px;font-weight:bold;padding-top:8px;"><a href="'+M+'" target="_blank" style="color:#FFFFFF;text-decoration:none;">'+esc(c.offer)+'</a></div>'+
+      (c.offerNote?'<div style="font-family:'+F+';font-size:14px;line-height:21px;color:#CFE0F5;padding-top:8px;">'+esc(c.offerNote)+'</div>':'')+'</td></tr>';
+  }
+  function briefHead(){
+    const d=t.sendDate?new Date(t.sendDate+'T00:00:00'):null;
+    const month=d?d.toLocaleDateString(ar?'ar-AE':'en-GB',{month:'long',year:'numeric'}):'';
+    return '<tr><td class="px" style="padding:28px 40px 4px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="'+START+'" style="font-family:'+F+';font-size:11px;line-height:16px;letter-spacing:'+(ar?'0':'2px')+';font-weight:bold;color:#0B2E59;text-transform:uppercase;">'+esc(c.eyebrow||X.brief)+'</td><td align="'+END+'" style="font-family:'+F+';font-size:11px;line-height:16px;color:#666666;white-space:nowrap;">'+esc(month)+'</td></tr>'+
+      '<tr><td colspan="2" style="padding-top:10px;"><div style="height:2px;line-height:2px;font-size:0;background:#0B2E59;">&nbsp;</div></td></tr></table></td></tr>';
+  }
+  const footnote=()=>c.footnote?'<tr><td align="center" class="px" style="padding:0 40px 24px;font-family:'+F+';font-size:12px;line-height:18px;color:#666666;">'+esc(c.footnote)+'</td></tr>':'';
+  const mp=t.imgPos||{}, moved=k=>mp[k]&&mp[k]!=='auto';
+  const heroPad=moved('hero')?'':(layout==='curiosity'?'14px 24px 18px':layout==='brief'?'':'24px 24px 6px');
+  let H;
+  if(layout==='classic') H={hero:imgRow(0,heroPad),headline:headline(30,'22px'),sub:sub(),p1:para(c.p1),sp01:spPair((c.sp||[])[0],(c.sp||[])[1]),stats:statRow(),pair:pairRow(),p2:para(c.p2),wide:imgRow(3),p3:amenities(c.p3),sp23:spPair((c.sp||[])[2],(c.sp||[])[3]),closing:closing(),buttons:buttons()};
+  else if(layout==='short') H={hero:imgRow(0,heroPad),eyebrow:eyebrow(),headline:headline(30),sub:sub(),stats:statRow(),p1:para(c.p1),buttons:buttons()};
+  else if(layout==='offer') H={offer:offerBand(),hero:imgRow(0,heroPad),headline:headline(28,'18px'),sub:sub(),stats:statRow(),p1:para(c.p1),buttons:buttons()};
+  else if(layout==='brief') H={brief:briefHead(),headline:headline(28,'14px'),sub:sub(),stats:figures(),p1:para(c.p1),bullets:bulletList('brief'),hero:imgRow(0,heroPad),buttons:buttons()};
+  else if(ED) H={hero:imgRow(0),eyebrow:eyebrow(),headline:headline(22),sub:sub(),p1:para(c.p1),highlight:highlight(),buttons:buttons()};
+  else H={eyebrow:eyebrow(),headline:headline(34,'10px'),hero:imgRow(0,heroPad),p1:para(c.p1),bullets:bulletList('cur'),buttons:buttons()};
+  const order=LAYOUT_SECTIONS[layout].slice();
+  ['hero','pair','wide'].forEach(k=>{
+    if(!moved(k)||!order.includes(k)) return;
+    const a=mp[k]==='top'?null:String(mp[k]).replace(/^after:/,'');
+    if(a===k||(a&&!order.includes(a))) return;
+    order.splice(order.indexOf(k),1);
+    order.splice(a?order.indexOf(a)+1:0,0,k);
+  });
+  const endIx=order.indexOf(order.includes('closing')?'closing':'buttons');
+  const autoA=ED?'highlight':(endIx>0?order[endIx-1]:'top');
+  const groups={}; let imgN=0;
+  templateBlocks(t).forEach((b,j)=>{
+    b=b||{}; const x={b,j,n:b.type==='image'?++imgN:0};
+    let a=b.pos||'auto';
+    a=a==='top'?'top':a==='auto'?autoA:String(a).replace(/^after:/,'');
+    if(a!=='top'&&!order.includes(a)) a=autoA;
+    (groups[a]=groups[a]||[]).push(x);
+  });
+  let body=(groups.top?groupHtml(groups.top):'')+order.map(k=>(H[k]||'')+(groups[k]?groupHtml(groups[k]):'')).join('')+footnote();
+  function pairRow(){
+    const a=img(1),b=img(2); if(!a&&!b) return '';
+    return '<tr><td class="px" style="padding:4px 18px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>'+(a?'<td class="col" width="50%" valign="top" style="padding:0 6px;">'+a+'</td>':'')+(b?'<td class="col" width="50%" valign="top" style="padding:0 6px;">'+b+'</td>':'')+'</tr></table></td></tr>';
+  }
+  if(!ED&&!/padding:2\dpx/.test(body.slice(0,200))) body='<tr><td style="font-size:0;line-height:0;height:6px;">&nbsp;</td></tr>'+body;
+  const pre=esc(sp.preview)+'&#847;&zwnj;&nbsp;'.repeat(70);
+  return ['<!DOCTYPE html>','<html lang="'+(ar?'ar':'en')+'" dir="'+dir+'" xmlns="http://www.w3.org/1999/xhtml">','<head>',
+    '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="x-apple-disable-message-reformatting">',
+    '<title>'+esc(sp.subject)+'</title>',
+    '<style>body{margin:0;padding:0;}img{-ms-interpolation-mode:bicubic;}a{color:#0B2E59;}@media only screen and (max-width:480px){.container{width:100%!important;}.px{padding-left:18px!important;padding-right:18px!important;}.stat{display:block!important;width:100%!important;border-left:0!important;border-right:0!important;}.stat-n{border-top:1px solid #DCE6F1!important;}.col{display:block!important;width:100%!important;padding:0 0 12px!important;}.btnc{padding:0 0 10px!important;}.h1{font-size:25px!important;line-height:32px!important;}}</style>',
+    ED&&!ar?'<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">':'',
+    preview?'<base target="_blank">':'','</head>',
+    '<body style="margin:0;padding:0;background:#EDF3FA;" dir="'+dir+'">',
+    '<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#EDF3FA;opacity:0;">'+pre+'</div>',
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EDF3FA;" dir="'+dir+'"><tr><td align="center" style="padding:24px 10px;">',
+    '<table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#FFFFFF;border-radius:'+(ED?0:14)+'px;">',
+    body,'</table>',
+    '<table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">',footerHtml(p,acct,lang,F),'</table>',
+    '</td></tr></table>','</body>','</html>'].filter(Boolean).join('\n');
+}
+// BUILDER-END
+
+const STATUSES=['Draft','Ready','Scheduled','Sent','Archived'];
+const HOST_HINT={Mailchimp:'https://mcusercontent.com/…/images/….jpg',GetResponse:'https://us-ms.gr-cdn.com/…/photos/….jpg',MailerLite:'https://bucket.mlcdn.com/a/…/images/….jpeg'};
+function imgAccts(){return (draft&&draft.accounts&&draft.accounts.length)?draft.accounts:Object.keys(ACCOUNTS)}
+const FD={
+  subject1:['Subject line 1',60,'text'], subject2:['Subject line 2',60,'text'], preview:['Preview text',100,'text'],
+  eyebrow:['Eyebrow label',32,'text'], headline:['Headline',70,'area'], sub:['Subheadline (links to the main CTA)',80,'text'],
+  highlight:['Highlight line (blue, e.g. 3-bed townhouses from AED 3.8M)',50,'text'],
+  offerLabel:['Band label (e.g. Launch offer, Ready now)',24,'text'], offer:['Offer line (dark band)',60,'area'], offerNote:['Offer note',90,'text'],
+  p1:['Paragraph 1 ("Read more..." is added)',0,'area'], p2:['Paragraph 2',0,'area'],
+  p3:['Amenities or paragraph',0,'area'], closing:['Ending headline',60,'text'], bulletsTitle:['List heading',50,'text'],
+  cta:['Main button label',22,'text'], cta2:['WhatsApp button label (shown when both links exist)',22,'text'], footnote:['Footnote',0,'text']
+};
+const RULES='House rules: the emails sell VAGUE, never name the project or the developer. No unprovable superlatives (best, most sought-after, fastest-growing, most anticipated). Hedge future events (planned, expected, scheduled to). Say "residency ELIGIBILITY", never "free residency". Do not invent sell-outs, deadlines, units left or price rises. Use only facts already in the copy below. Arabic is written natively for Gulf readers, not translated word for word. Keep it short and specific.';
+let db=null, assets=null, downloads=null, sample=null, uid=null;
+let projects={}, templates=[], projId=null, selId=null, draft=null, dirty=false, remoteChanged=false;
+let lang='en', acct='GR1', viewW=600, tab='copy', unsubVers=null, versions=[], busy='';
+const $=s=>document.querySelector(s);
+const clone=o=>JSON.parse(JSON.stringify(o||{}));
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600)}
+function cur(){return templates.find(x=>x.id===selId)}
+function proj(){return projects[projId]||{}}
+function lay(){return LAYOUTS[draft&&draft.layout]||LAYOUTS.classic}
+function fmtKB(b){return (b/1024).toFixed(b<10240?1:0)+' KB'}
+function fmtDate(d){if(!d)return 'No date';const x=new Date(d+'T00:00:00');return x.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}
+function weekKey(d){if(!d)return 'zz';const x=new Date(d+'T00:00:00');x.setDate(x.getDate()-x.getDay());return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+function getPath(o,p){return p.split('.').reduce((a,k)=>a==null?a:a[k],o)}
+function setPath(o,p,v){const ks=p.split('.');let a=o;ks.slice(0,-1).forEach((k,i)=>{if(a[k]==null||typeof a[k]!=='object')a[k]=/^\d+$/.test(ks[i+1])?[]:{};a=a[k]});a[ks[ks.length-1]]=v}
+function aiErr(e){const c=e&&e.code;return c==='not_granted'?'Claude access was declined for this page.':c==='rate_limited'?'Too many requests. Try again in a minute.':c==='invalid_json'?'Claude replied in an unexpected format. Try again.':'Claude could not finish that. Try again.'}
+
+/* ---------- list ---------- */
+function renderList(){
+  const q=$('#search').value.trim().toLowerCase(), sf=$('#statusFilter').value;
+  const rows=templates.filter(t=>t.data.project===projId)
+    .filter(t=>sf==='active'?t.data.status!=='Archived':t.data.status===sf)
+    .filter(t=>!q||[t.data.angleId,t.data.title,(t.data.en||{}).headline,(t.data.ar||{}).headline].join(' ').toLowerCase().includes(q))
+    .sort((a,b)=>(a.data.sendDate||'9999').localeCompare(b.data.sendDate||'9999')||(a.data.order||0)-(b.data.order||0));
+  $('#count').textContent=rows.length+' shown';
+  const L=$('#list');
+  if(!templates.length){L.innerHTML='<div class="empty">No templates yet. Send Claude a project or brochure and its templates will appear here.</div>';return}
+  if(!rows.length){L.innerHTML='<div class="empty">No templates match this filter.</div>';return}
+  let html='',wk=null;
+  rows.forEach(t=>{
+    const d=t.id===selId&&draft?draft:t.data;
+    const k=weekKey(d.sendDate);
+    if(k!==wk){wk=k;html+='<div class="wk">'+(k==='zz'?'Not scheduled':'Week of '+new Date(k+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}))+'</div>'}
+    html+='<button type="button" class="item" data-id="'+esc(t.id)+'" aria-current="'+(t.id===selId)+'"><span class="t">'+esc(d.angleId)+' · '+esc(d.title)+(t.id===selId&&dirty?' <span class="dot" title="Unsaved"></span>':'')+'</span>'+
+      '<span class="m"><span>'+fmtDate(d.sendDate)+'</span><span>'+(d.sendLang==='ar'?'AR':'EN')+'</span><span class="lay">'+esc((LAYOUTS[d.layout]||LAYOUTS.classic).short)+'</span><span class="chip st-'+esc(d.status||'Draft')+'">'+esc(d.status||'Draft')+'</span></span></button>';
+  });
+  L.innerHTML=html;
+}
+$('#list').addEventListener('click',e=>{const b=e.target.closest('.item');if(b)select(b.dataset.id)});
+$('#search').addEventListener('input',renderList);$('#statusFilter').addEventListener('change',renderList);
+
+function select(id){
+  if(dirty&&id!==selId){ if(select._warned!==id){select._warned=id;toast('Unsaved changes. Click again to leave without saving.');return} }
+  select._warned=null;
+  selId=id;const t=cur();draft=migrateDraft(clone(t&&t.data));dirty=false;remoteChanged=false;
+  if(draft&&draft.sendLang){lang=draft.sendLang;syncSeg()}
+  if(draft&&draft.accounts&&draft.accounts.length&&!draft.accounts.includes(acct)){acct=draft.accounts[0];$('#acctSel').value=acct}
+  subscribeVersions();renderList();renderEditor();schedulePreview();
+}
+
+/* ---------- editor ---------- */
+function field(path,label,max,kind,rtl,ph){
+  const v=getPath(draft,path)||'';const id='f-'+path.replace(/\./g,'-');
+  const rows=/\.(p1|p2|p3)$|^blocks\.\d+\.\w+\.text$/.test(path)?4:2;
+  const ctrl=kind==='area'?'<textarea id="'+id+'" data-path="'+path+'" rows="'+rows+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'>'+esc(v)+'</textarea>':'<input type="text" id="'+id+'" data-path="'+path+'" value="'+esc(v)+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'>';
+  return '<div class="f"'+(rtl?' dir="rtl"':'')+'><label for="'+id+'"><span>'+label+'</span>'+(max?'<span class="cnt'+(v.length>max?' over':'')+'" data-cnt="'+path+'" data-max="'+max+'">'+v.length+'/'+max+'</span>':'')+'</label>'+ctrl+'</div>';
+}
+function layoutFieldsHtml(rtl){
+  const L=lay(), X=TXT[lang]; let h='';
+  L.fields.forEach(k=>{
+    if(k==='stats'){
+      h+='<div class="f"'+(rtl?' dir="rtl"':'')+'><label><span>'+(draft.layout==='brief'?'Key figures (value · label)':'Stat row (value · label)')+'</span></label><div class="stats">';
+      for(let s=0;s<3;s++) h+='<div class="statrow"><input type="text" aria-label="Stat '+(s+1)+' value" id="f-'+lang+'-st'+s+'v" data-path="'+lang+'.stats.'+s+'.v" value="'+esc(getPath(draft,lang+'.stats.'+s+'.v')||'')+'"><input type="text" aria-label="Stat '+(s+1)+' label" id="f-'+lang+'-st'+s+'l" data-path="'+lang+'.stats.'+s+'.l" value="'+esc(getPath(draft,lang+'.stats.'+s+'.l')||'')+'"></div>';
+      h+='</div><div class="hint">Keep values short (up to ~9 characters). Leave a row empty to show two.</div></div>';
+    } else if(k==='sp01'||k==='sp23'){
+      const a=k==='sp01'?0:2;
+      h+='<div class="f"'+(rtl?' dir="rtl"':'')+'><label><span>Selling points '+(a+1)+' and '+(a+2)+'</span></label><div class="rows">'+
+        [a,a+1].map(i=>'<input type="text" aria-label="Selling point '+(i+1)+'" id="f-'+lang+'-sp'+i+'" data-path="'+lang+'.sp.'+i+'" value="'+esc(getPath(draft,lang+'.sp.'+i)||'')+'" placeholder="First line / second line">').join('')+
+        '</div><div class="hint">Use " / " to split each point into its two lines.</div></div>';
+    } else if(k==='bullets'){
+      h+=field(lang+'.bulletsTitle','List heading',50,'text',rtl,draft.layout==='brief'?X.bulletsBrief:X.bulletsCur).replace('','');
+      h+='<div class="f"'+(rtl?' dir="rtl"':'')+'><label><span>'+(draft.layout==='brief'?'Three reasons':'Three things shared on request')+'</span></label><div class="rows">'+
+        [0,1,2].map(i=>'<input type="text" aria-label="List item '+(i+1)+'" id="f-'+lang+'-b'+i+'" data-path="'+lang+'.bullets.'+i+'" value="'+esc(getPath(draft,lang+'.bullets.'+i)||'')+'">').join('')+'</div></div>';
+    } else if(k==='bulletsTitle'){ /* rendered with bullets */ }
+    else { const d=FD[k]; h+=field(lang+'.'+k,d[0],d[1],d[2],rtl, k==='p3'?'Amenities\n- Private beach\n- Clubhouse\n- Padel courts\n- Linear parks':''); if(k==='p3') h+='<div class="hint">Lines starting with "-" become a two-column amenities list; the first plain line is its heading. Plain text shows as a paragraph.</div>'; }
+  });
+  return h;
+}
+function emptyFields(t,lng){
+  const c=t[lng]||{}, L=LAYOUTS[t.layout]||LAYOUTS.classic, out=[];
+  L.fields.forEach(k=>{
+    if(k==='stats'){if(!(c.stats||[]).some(s=>s&&s.v))out.push('stats')}
+    else if(k==='sp01'){if(!(c.sp||[])[0]||!(c.sp||[])[1])out.push('sp01')}
+    else if(k==='sp23'){if(!(c.sp||[])[2]||!(c.sp||[])[3])out.push('sp23')}
+    else if(k==='bullets'){if((c.bullets||[]).filter(Boolean).length<3)out.push('bullets')}
+    else if(k==='bulletsTitle'||k==='p2'||k==='sub'||k==='offerLabel'||k==='highlight'||(t.layout==='editorial'&&k==='eyebrow')){}
+    else if(!c[k])out.push(k);
+  });
+  if(!c.cta)out.push('cta');
+  return out;
+}
+function renderEditor(){
+  const E=$('#editor');
+  if(!draft){E.innerHTML='<div class="empty">Pick a template on the left to edit it.</div>';return}
+  const rtl=lang==='ar', L=lay(); let body='';
+  if(tab==='copy'){
+    body+='<div class="laycard"><div class="f"><label for="f-layout">Layout</label><select id="f-layout" data-path="layout">'+Object.entries(LAYOUTS).map(([k,v])=>'<option value="'+k+'"'+((draft.layout||'classic')===k?' selected':'')+'>'+v.name+'</option>').join('')+'</select></div><div class="hint">'+esc(L.hint)+'</div>'+(draft.layout==='editorial'?'<div style="margin-top:8px"><button type="button" class="btn small" id="edStarterBtn">Add the brochure sections</button> <span class="hint" style="display:inline">Adds villas, townhouses, amenities, why now, payment plan, location and closing sections with sample text. Edit or delete any of them in the Blocks tab.</span></div>':'')+'</div>';
+    body+='<div class="meta"><span>'+esc(draft.stage||'')+'</span><span>'+esc(draft.audience||'')+'</span></div>';
+    if(draft.hook) body+='<div class="hint">Rides on: '+esc(draft.hook)+'</div>';
+    const miss=emptyFields(draft,'en').length+emptyFields(draft,'ar').length;
+    if(miss) body+='<div class="banner">'+miss+' field'+(miss>1?'s':'')+' in this layout '+(miss>1?'are':'is')+' empty (English and Arabic). <button type="button" class="btn small ai" id="fillBtn"'+(sample?'':' disabled')+'>'+(busy==='fill'?'Writing…':'Fill empty fields with Claude')+'</button></div>';
+    body+='<div class="sec">Subject (default for all accounts)</div>'+field(lang+'.subject1',FD.subject1[0],60,'text',rtl)+field(lang+'.subject2',FD.subject2[0],60,'text',rtl)+field(lang+'.preview',FD.preview[0],100,'text',rtl);
+    body+='<div class="hint">Each account can have its own subject and preview in the Subjects tab.</div>';
+    body+='<div class="sec">Email · '+(rtl?'Arabic':'English')+'</div>'+layoutFieldsHtml(rtl);
+    body+='<div class="sec">Buttons</div>'+field(lang+'.cta',FD.cta[0],22,'text',rtl)+field(lang+'.cta2',FD.cta2[0],22,'text',rtl,TXT[lang].cta2)+field(lang+'.footnote',FD.footnote[0],0,'text',rtl);
+  } else if(tab==='subjects'){
+    const accts=(draft.accounts&&draft.accounts.length)?draft.accounts:Object.keys(ACCOUNTS);
+    body+='<div class="hint">A different subject and preview per account, so the same email does not land twice with the same line. Empty boxes use the default subject line 1.</div>';
+    body+='<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn small ai" id="varBtn"'+(sample?'':' disabled')+'>'+(busy==='var'?'Writing…':'Write empty ones with Claude')+'</button><button type="button" class="btn small ai" id="varAllBtn"'+(sample?'':' disabled')+'>Rewrite all with Claude</button></div>';
+    accts.forEach(a=>{
+      const base='acctCopy.'+a+'.'+lang, d=subjectFor(Object.assign({},draft,{acctCopy:{}}),a,lang);
+      body+='<div class="acct"><div class="h"><b>'+a+'</b><span class="muted" style="font-size:12px">'+ACCOUNTS[a].platform+'</span></div>'+
+        field(base+'.subject','Subject',60,'text',rtl,d.subject)+field(base+'.preview','Preview text',100,'text',rtl,d.preview)+'</div>';
+    });
+  } else if(tab==='images'){
+    body+='<div class="hint">This layout has '+L.imgs.length+' fixed image slot'+(L.imgs.length>1?'s':'')+'; add more at the bottom. Every image has a Position menu to move it anywhere in the email. Upload a file to see it in the preview and count its size, then paste its hosted URL from your email platform for the export. Claude writes alt text from the uploaded file; with only a URL it can write alt text from the email copy, not from the picture.</div>';
+    body+='<div><button type="button" class="btn small ai" id="altAllBtn"'+(sample?'':' disabled')+'>'+(busy==='alt'?'Writing…':'Write alt text for all images')+'</button></div>';
+    allSlots().forEach(s=>{
+      const im=s.im, key=s.key, idk=key.replace(/\./g,'-');
+      const extra=key.startsWith('blocks.'), j=extra?s.j:-1;
+      const imgJs=allSlots().filter(x=>x.key.startsWith('blocks.')).map(x=>x.j), ix=imgJs.indexOf(j);
+      if(extra&&ix===0) body+='<div class="sec">More images</div><div class="hint">Pick where each one goes. Half-width images next to each other in the same position sit side by side; full-width images take a row each. Text and buttons can be added in the Blocks tab.</div>';
+      const sec=extra?null:SLOT_SECTION[+key.split('.')[1]];
+      body+='<div class="imgslot"><div class="h"><b>'+s.label+'</b><span class="muted mono" style="font-size:12px">'+s.size+'</span></div>'+
+        (extra?'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'+posSelect(key+'.pos',im.pos,null,defaultSpot())+'<select data-path="'+key+'.shape" id="f-'+idk+'-shape" aria-label="Image width" style="width:auto"><option value="full"'+(im.shape!=='half'?' selected':'')+'>Full width</option><option value="half"'+(im.shape==='half'?' selected':'')+'>Half width (pairs)</option></select>'+
+          '<button type="button" class="btn small" data-mvimg="'+j+':-1"'+(ix===0?' disabled':'')+' aria-label="Move up">Up</button><button type="button" class="btn small" data-mvimg="'+j+':1"'+(ix===imgJs.length-1?' disabled':'')+' aria-label="Move down">Down</button><button type="button" class="btn small" data-rmblk="'+j+'">Remove</button></div>'
+          :(sec&&(key!=='images.2')?'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'+posSelect('imgPos.'+sec,(draft.imgPos||{})[sec],sec,'Default (where the layout puts it)')+(sec==='pair'?'<span class="hint" style="margin:0">Moves both pair images</span>':'')+'</div>':''))+
+        '<div class="thumb">'+(im.previewUrl?'<img src="'+esc(im.previewUrl)+'" alt="">':'')+'<div style="min-width:0"><input type="file" accept="image/png,image/jpeg,image/gif,image/webp" data-up="'+key+'" id="up-'+idk+'" aria-label="Upload '+s.label+'"'+(assets?'':' disabled')+'>'+
+        '<div class="hint mono">'+(im.sizeBytes?esc(im.fileName||'')+' · '+fmtKB(im.sizeBytes)+(im.w?' · '+im.w+'×'+im.h:''):(assets?'No file yet':'Uploads need edit access'))+'</div></div></div>'+
+        '<div class="f"><label>Image link per account (used in the export)</label><div class="rows">'+
+          imgAccts().map(a=>{const u=((im.urls||{})[a])||'';const bad=u&&!imgHostOk(u,a);return '<div class="statrow" style="grid-template-columns:64px minmax(0,1fr)"><label for="f-'+idk+'-urls-'+a+'" class="mono" style="align-self:center;margin:0;font-size:12px">'+a+'</label><input type="url" id="f-'+idk+'-urls-'+a+'" data-path="'+key+'.urls.'+a+'" value="'+esc(u)+'" placeholder="'+esc(HOST_HINT[ACCOUNTS[a].platform])+'"'+(bad?' style="border-color:var(--warn)"':'')+'></div>'+(bad?'<div class="hint" style="color:var(--warn)">This doesn\'t look like a '+ACCOUNTS[a].platform+' image link.</div>':'')}).join('')+
+          '</div>'+(key==='images.0'?'<div class="hint">Upload the image to each platform and paste the link it gives you, so every email uses its own platform\'s image host.</div>':'')+'</div>'+
+          (im.url?'<div class="f"><label for="f-'+idk+'-url">Fallback link (any account without its own)</label><input type="url" id="f-'+idk+'-url" data-path="'+key+'.url" value="'+esc(im.url)+'"></div>':'')+
+        '<div class="f"><label for="f-'+idk+'-altEn"><span>Alt text, English</span><button type="button" class="btn small ai" data-alt="'+key+'"'+(sample?'':' disabled')+'>Write with Claude</button></label><input type="text" id="f-'+idk+'-altEn" data-path="'+key+'.altEn" value="'+esc(im.altEn||'')+'"></div>'+
+        '<div class="f" dir="rtl"><label for="f-'+idk+'-altAr">النص البديل، عربي</label><input type="text" id="f-'+idk+'-altAr" data-path="'+key+'.altAr" value="'+esc(im.altAr||'')+'"></div>'+
+        (!extra&&(im.previewUrl||im.url||Object.values(im.urls||{}).some(Boolean))?'<div><button type="button" class="btn small" data-clearimg="'+key+'">Clear slot</button></div>':'')+'</div>';
+    });
+    body+='<div><button type="button" class="btn" id="addImg">+ Add image</button></div>';
+  } else if(tab==='blocks'){
+    body+=blocksTabHtml(rtl);
+  } else if(tab==='send'){
+    const p=proj(), lk=resolveLinks(p,draft,acct,lang);
+    body+='<div class="f"><label for="f-title">Template name</label><input type="text" id="f-title" data-path="title" value="'+esc(draft.title||'')+'"></div>';
+    body+='<div class="f"><label for="f-status">Status</label><select id="f-status" data-path="status">'+STATUSES.map(s=>'<option'+(draft.status===s?' selected':'')+'>'+s+'</option>').join('')+'</select></div>';
+    body+='<div class="f"><label for="f-sendDate">Send date</label><input type="date" id="f-sendDate" data-path="sendDate" value="'+esc(draft.sendDate||'')+'"></div>';
+    body+='<div class="f"><label for="f-codeOverride">Campaign code</label><input type="text" id="f-codeOverride" data-path="codeOverride" value="'+esc(draft.codeOverride||'')+'" placeholder="'+esc(campaignCode(p,Object.assign({},draft,{codeOverride:''})))+'"><div class="hint">Leave empty to use the project pattern ('+esc(p.codePattern||'{project}-{date}')+'). Give A/B versions their own code.</div></div>';
+    body+='<div class="f"><label>Send in</label><div class="seg" role="group" aria-label="Send language"><button type="button" data-sendlang="en" aria-pressed="'+(draft.sendLang!=='ar')+'">English</button><button type="button" data-sendlang="ar" aria-pressed="'+(draft.sendLang==='ar')+'">Arabic</button></div></div>';
+    body+='<div class="f"><label>Accounts</label><div class="accts">'+Object.keys(ACCOUNTS).map(a=>'<label><input type="checkbox" data-acct="'+a+'"'+((draft.accounts||[]).includes(a)?' checked':'')+'> '+a+'</label>').join('')+'</div></div>';
+    const hasLanding=Object.keys(ACCOUNTS).some(a=>landingUrl(p,Object.assign({},draft,{useLanding:true}),a));
+    body+='<div class="f"><label>Links in this email</label><div class="toggles"><label><input type="checkbox" data-tog="useLanding"'+(draft.useLanding!==false?' checked':'')+(hasLanding?'':' disabled')+'> Landing page'+(hasLanding?'':' (none set)')+'</label><label><input type="checkbox" data-tog="useWhatsapp"'+(draft.useWhatsapp!==false?' checked':'')+'> WhatsApp</label></div>'+
+      '<div class="hint">Both on: the main button, subheadline and "Read more..." go to the landing page; images, the WhatsApp button and "On request" tags go to WhatsApp. One on: every link uses it.</div>'+
+      '<div><button type="button" class="btn small" id="editLandingBtn">'+(hasLanding?'Edit landing pages':'Add landing pages')+'</button></div></div>';
+    body+='<div class="f"><label>Main link for '+acct+'</label><div class="link-out">'+esc(lk.main)+'</div></div>';
+    if(lk.both) body+='<div class="f"><label>Images and WhatsApp button for '+acct+'</label><div class="link-out">'+esc(lk.side)+'</div></div>';
+    body+='<div class="f"><label for="f-waTextEn">WhatsApp message for this email, English</label><input type="text" id="f-waTextEn" data-path="waTextEn" value="'+esc(draft.waTextEn||'')+'" placeholder="'+esc(waMessage(p,{},'en'))+'"></div>';
+    body+='<div class="f" dir="rtl"><label for="f-waTextAr">رسالة واتساب لهذه الرسالة، عربي</label><input type="text" id="f-waTextAr" data-path="waTextAr" value="'+esc(draft.waTextAr||'')+'" placeholder="'+esc(waMessage(p,{},'ar'))+'"></div>';
+    body+='<div class="hint">Leave empty to use the project message. The ref, e.g. (Ref - '+esc(lk.code)+' '+acct+'), is added after it automatically.</div>';
+    body+='<div class="f"><label for="f-notes">Notes</label><textarea id="f-notes" data-path="notes" rows="3">'+esc(draft.notes||'')+'</textarea></div>';
+  } else {
+    body+='<div class="hint">Every save keeps a copy. Restoring loads that copy into the editor; save to make it current.</div>';
+    body+=versions.length?versions.map(v=>'<div class="ver"><div><b>Version '+v.rev+'</b><div class="hint">'+new Date(v.savedAt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+(v.note?' · '+esc(v.note):'')+'</div></div><button type="button" class="btn small" data-restore="'+esc(v.id)+'">Restore</button></div>').join(''):'<div class="empty">No saved versions yet. The copy from the content plan is the starting point.</div>';
+  }
+  E.innerHTML='<div class="panel-h"><h2>'+esc(draft.angleId)+'</h2><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(draft.title)+'</span><button type="button" class="btn small" id="dupBtn">Duplicate</button></div>'+
+    (remoteChanged?'<div class="banner">Someone saved a newer version of this template. <button type="button" class="btn small" id="loadLatest">Load latest</button></div>':'')+
+    '<div class="tabs" role="tablist">'+[['copy','Copy · '+(rtl?'Arabic':'English')],['subjects','Subjects'],['images','Images'],['blocks','Blocks'+((draft.blocks||[]).length?' ('+draft.blocks.length+')':'')],['send','Send & links'],['history','History']].map(([k,l])=>'<button type="button" role="tab" class="tab" data-tab="'+k+'" aria-selected="'+(tab===k)+'">'+l+'</button>').join('')+'</div>'+
+    '<div class="form">'+body+'</div>'+
+    '<div class="savebar">'+(dirty?'<span class="dot"></span><span>Unsaved changes</span>':'<span class="muted">'+(cur()&&cur().data.updatedAt?'Saved '+new Date(cur().data.updatedAt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'From the content plan')+'</span>')+
+    '<span style="flex:1"></span><input type="text" id="saveNote" placeholder="Note (optional)" style="width:150px" aria-label="Version note"><button type="button" class="btn" id="discardBtn"'+(dirty?'':' disabled')+'>Discard</button><button type="button" class="btn primary" id="saveBtn"'+(dirty?'':' disabled')+'>Save version</button></div>';
+}
+function markDirty(){ if(!dirty){dirty=true;renderSavebar()} schedulePreview(); renderListSoon(); }
+function renderSavebar(){const s=$('#saveBtn'),d=$('#discardBtn');if(s){s.disabled=!dirty;d.disabled=!dirty;const first=s.parentElement.firstElementChild;if(dirty&&!first.classList.contains('dot'))first.outerHTML='<span class="dot"></span><span>Unsaved changes</span>'}}
+let lt;function renderListSoon(){clearTimeout(lt);lt=setTimeout(renderList,400)}
+$('#editor').addEventListener('input',e=>{
+  const p=e.target.dataset.path; if(!p||!draft||e.target.tagName==='SELECT')return;
+  setPath(draft,p,e.target.value);
+  const c=document.querySelector('[data-cnt="'+p+'"]'); if(c){const m=+c.dataset.max;c.textContent=e.target.value.length+'/'+m;c.classList.toggle('over',e.target.value.length>m)}
+  markDirty();
+});
+$('#editor').addEventListener('change',async e=>{
+  const el=e.target;
+  if(el.dataset.acct){const s=new Set(draft.accounts||[]);el.checked?s.add(el.dataset.acct):s.delete(el.dataset.acct);draft.accounts=Object.keys(ACCOUNTS).filter(a=>s.has(a));markDirty();return}
+  if(el.dataset.tog){draft[el.dataset.tog]=el.checked;markDirty();renderEditor();return}
+  if(el.dataset.btog){const [j,k]=el.dataset.btog.split(':');draft.blocks[+j][k]=el.checked;markDirty();return}
+  if(el.dataset.path&&(el.tagName==='SELECT'||el.type==='date')){setPath(draft,el.dataset.path,el.value);markDirty();renderEditor();return}
+  if(el.dataset.up!=null) await upload(el.dataset.up,el.files[0]);
+});
+$('#editor').addEventListener('click',async e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  if(b.dataset.tab){tab=b.dataset.tab;renderEditor();return}
+  if(b.dataset.sendlang){draft.sendLang=b.dataset.sendlang;lang=b.dataset.sendlang;syncSeg();markDirty();renderEditor();return}
+  if(b.dataset.clearimg){setPath(draft,b.dataset.clearimg,{});markDirty();renderEditor();return}
+  if(b.dataset.rmblk){draft.blocks.splice(+b.dataset.rmblk,1);markDirty();renderEditor();return}
+  if(b.dataset.mvblk){const [j,d]=b.dataset.mvblk.split(':').map(Number),a=draft.blocks;if(a[j+d]){[a[j],a[j+d]]=[a[j+d],a[j]];markDirty();renderEditor()}return}
+  if(b.dataset.mvimg){const [j,d]=b.dataset.mvimg.split(':').map(Number),a=draft.blocks;let k=j+d;while(a[k]&&a[k].type!=='image')k+=d;if(a[k]){[a[j],a[k]]=[a[k],a[j]];markDirty();renderEditor()}return}
+  if(b.id==='addImg'){draft.blocks=(draft.blocks||[]).concat([{type:'image',shape:'full',pos:'auto'}]);markDirty();renderEditor();return}
+  if(b.dataset.addblock){const t=b.dataset.addblock,nb={type:t,pos:'auto'};if(t==='image')nb.shape='full';if(t==='button'){nb.link='whatsapp';nb.style='light'}draft.blocks=(draft.blocks||[]).concat([nb]);markDirty();renderEditor();toast(BLOCK_TYPES[t]+' added above the '+(defaultSpot().includes('ending')?'ending headline':'buttons')+'.');return}
+  if(b.id==='blkTrBtn')return translateBlocks();
+  if(b.id==='editLandingBtn'){$('#projBtn').click();return}
+  if(b.dataset.alt){e.preventDefault();return writeAlt([b.dataset.alt])}
+  if(b.dataset.restore){const v=versions.find(x=>x.id===b.dataset.restore);if(v){draft=migrateDraft(Object.assign(clone(v.snapshot),{project:draft.project}));dirty=true;tab='copy';renderEditor();schedulePreview();toast('Version '+v.rev+' loaded. Save to make it current.')}return}
+  if(b.id==='saveBtn')return save();
+  if(b.id==='discardBtn'){draft=migrateDraft(clone(cur().data));dirty=false;renderEditor();schedulePreview();renderList();return}
+  if(b.id==='loadLatest'){draft=migrateDraft(clone(cur().data));dirty=false;remoteChanged=false;renderEditor();schedulePreview();return}
+  if(b.id==='dupBtn')return duplicate();
+  if(b.id==='edStarterBtn'){draft.blocks=(draft.blocks||[]).concat(edStarter());markDirty();tab='blocks';renderEditor();schedulePreview();toast('Brochure sections added. Edit them here, then save.');return}
+  if(b.id==='fillBtn')return fillEmpty();
+  if(b.id==='varBtn')return writeVariants(false);
+  if(b.id==='varAllBtn')return writeVariants(true);
+  if(b.id==='altAllBtn')return writeAlt(allSlots().map(s=>s.key));
+});
+
+/* ---------- Claude helpers ---------- */
+function copyContext(){
+  const pick=l=>{const c=draft[l]||{};return {headline:c.headline,sub:c.sub,stats:c.stats,p1:c.p1,p2:c.p2,offer:c.offer,cta:c.cta,subject1:c.subject1,preview:c.preview}};
+  return 'Angle: '+draft.angleId+' ('+draft.title+'). Audience: '+(draft.audience||'')+'. Hook: '+(draft.hook||'')+'.\nEnglish copy: '+JSON.stringify(pick('en'))+'\nArabic copy: '+JSON.stringify(pick('ar'));
+}
+async function fillEmpty(){
+  if(!sample||busy)return; busy='fill'; renderEditor();
+  const L=lay(), need={en:emptyFields(draft,'en'),ar:emptyFields(draft,'ar')};
+  const spec='Field formats: headline (max 70 chars), sub (max 80), eyebrow (max 32, uppercase-style label), p1/p2/p3 (2-3 sentences, no "Read more"), p3 may instead be an amenities list: a heading line then lines starting with "- ", offer (max 60, the launch offer line), offerNote (max 90), closing (ending headline, max 60), cta (button, max 22 chars), stats (array of 3 {"v": short value up to 9 chars, "l": short label}), sp01 (array of 2 selling points, each "first line / second line", each line max 24 chars), sp23 (same as sp01, two different points), bullets (array of 3 short lines, max 70 chars each).';
+  const prompt=RULES+'\n\nThis is a UAE off-plan property lead-generation email in the "'+L.name+'" layout. Write ONLY the missing fields listed, in both languages where listed.\nMissing: '+JSON.stringify(need)+'\n'+spec+'\n\n'+copyContext()+'\n\nReply with only a JSON object: {"en":{field:value,...},"ar":{field:value,...}} containing exactly the missing fields.';
+  try{
+    const r=await sample.json(prompt,{modelTier:'default'});
+    ['en','ar'].forEach(l=>{const o=(r||{})[l]||{};draft[l]=draft[l]||{};
+      Object.entries(o).forEach(([k,v])=>{
+        if(k==='sp01'&&Array.isArray(v)){draft[l].sp=draft[l].sp||[];[0,1].forEach(i=>{if(!draft[l].sp[i])draft[l].sp[i]=v[i]||''})}
+        else if(k==='sp23'&&Array.isArray(v)){draft[l].sp=draft[l].sp||[];[0,1].forEach(i=>{if(!draft[l].sp[i+2])draft[l].sp[i+2]=v[i]||''})}
+        else if(k==='bullets'&&Array.isArray(v)){draft[l].bullets=[0,1,2].map(i=>(draft[l].bullets||[])[i]||v[i]||'')}
+        else if(k==='stats'&&Array.isArray(v)){draft[l].stats=v.slice(0,3)}
+        else if(typeof v==='string'&&!draft[l][k])draft[l][k]=v;
+      })});
+    toast('Filled. Review the copy before saving.');markDirty();
+  }catch(e){toast(aiErr(e))}
+  busy='';renderEditor();
+}
+async function writeVariants(all){
+  if(!sample||busy)return; busy='var'; renderEditor();
+  const accts=(draft.accounts&&draft.accounts.length)?draft.accounts:['GR1','GR2','MC1'];
+  const prompt=RULES+'\n\nWrite a different email subject line (max 55 chars) and preview text (max 95 chars, adds a second reason to open, never repeats the subject) for each sending account, in English and Arabic. Every account must get a clearly different hook drawn from the copy below (a number, a question, the offer, scarcity, a comparison). No emoji, no ALL CAPS, no clickbait.\nAccounts: '+accts.join(', ')+'\n\n'+copyContext()+'\n\nReply with only JSON: {"ACCOUNT":{"en":{"subject":"","preview":""},"ar":{"subject":"","preview":""}},...}';
+  try{
+    const r=await sample.json(prompt,{modelTier:'default'});
+    draft.acctCopy=draft.acctCopy||{};
+    accts.forEach(a=>['en','ar'].forEach(l=>{const v=((r||{})[a]||{})[l]||{};const cur0=((draft.acctCopy[a]||{})[l])||{};
+      ['subject','preview'].forEach(k=>{if(v[k]&&(all||!cur0[k]))setPath(draft,'acctCopy.'+a+'.'+l+'.'+k,v[k])})}));
+    toast('Subject lines written. Review before saving.');markDirty();
+  }catch(e){toast(aiErr(e))}
+  busy='';renderEditor();
+}
+function allSlots(){
+  const main=lay().imgs.map(i=>({key:'images.'+i,im:(draft.images||[])[i]||{},label:'Image '+(i+1)+' · '+IMG_SPECS[i].name,size:IMG_SPECS[i].size}));
+  let n=0;
+  const extra=(draft.blocks||[]).map((b,j)=>({b,j})).filter(x=>x.b&&x.b.type==='image').map(x=>({key:'blocks.'+x.j,j:x.j,im:x.b,label:'Extra image '+(++n),size:x.b.shape==='half'?'800 × 800 px':'1200 px wide'}));
+  return main.concat(extra);
+}
+function migrateDraft(d){
+  if(d&&!Array.isArray(d.blocks)){d.blocks=templateBlocks(d);delete d.extraImages}
+  return d;
+}
+function posSelect(path,cur,exclude,autoLbl){
+  const L=LAYOUT_SECTIONS[draft.layout]||LAYOUT_SECTIONS.classic;
+  const opts=[['auto',autoLbl],['top','At the very top']].concat(L.filter(k=>k!==exclude).map(k=>['after:'+k,k==='buttons'?'At the end, after the buttons':'After '+secLabel(k,draft.layout)]));
+  const id='f-'+path.replace(/\./g,'-');
+  return '<label for="'+id+'" class="muted" style="font-size:12px;margin:0">Position</label><select data-path="'+path+'" id="'+id+'" style="width:auto;max-width:100%">'+opts.map(([v,l])=>'<option value="'+v+'"'+((cur||'auto')===v?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select>';
+}
+function defaultSpot(){if(draft.layout==='editorial')return 'Default (in order, before the closing buttons)';const L=LAYOUT_SECTIONS[draft.layout]||LAYOUT_SECTIONS.classic;return 'Default (above the '+(L.includes('closing')?'ending headline':'buttons')+')'}
+const SLOT_SECTION={0:'hero',1:'pair',2:'pair',3:'wide'};
+function blockEmpty(b,lng){
+  if(!b) return false;
+  if(['heading','paragraph','text','callout','list','eyebrow','rows','plan'].includes(b.type)) return !String(((b[lng]||{}).text)||'').trim();
+  if(b.type==='pair') return !String(((b[lng]||{}).a)||'').trim()&&!String(((b[lng]||{}).b)||'').trim();
+  if(b.type==='button') return !String(((b[lng]||{}).label)||'').trim();
+  return false;
+}
+function blocksTabHtml(rtl){
+  const bl=draft.blocks||[], n=bl.length; let h='';
+  h+='<div class="hint">Add your own headings, paragraphs, buttons, lists and images anywhere in the email, and pick where each one goes. Text is per language: switch English / Arabic at the top to fill both. Empty blocks are left out of the export.</div>';
+  const both=bl.some(b=>blockEmpty(b,'en')!==blockEmpty(b,'ar'));
+  if(both) h+='<div><button type="button" class="btn small ai" id="blkTrBtn"'+(sample?'':' disabled')+'>'+(busy==='blk'?'Writing…':'Write the missing language with Claude')+'</button></div>';
+  let imgN=0;
+  bl.forEach((b,j)=>{
+    b=b||{}; const base='blocks.'+j, idk='blk'+j, t=b.type;
+    const name=BLOCK_TYPES[t]||t;
+    h+='<div class="imgslot"><div class="h"><b>'+(j+1)+' · '+esc(t==='image'?'Extra image '+(++imgN):name)+'</b>'+(blockEmpty(b,lang)?'<span class="muted" style="font-size:12px">Empty in '+(rtl?'Arabic':'English')+'</span>':'')+'</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'+posSelect(base+'.pos',b.pos,null,defaultSpot())+
+      '<button type="button" class="btn small" data-mvblk="'+j+':-1"'+(j===0?' disabled':'')+'>Up</button><button type="button" class="btn small" data-mvblk="'+j+':1"'+(j===n-1?' disabled':'')+'>Down</button><button type="button" class="btn small" data-rmblk="'+j+'">Remove</button></div>';
+    if(['heading','paragraph','text','callout'].includes(t)){
+      h+=field(base+'.'+lang+'.text',name+' text',t==='heading'?70:0,t==='heading'?'text':'area',rtl);
+      if(t==='paragraph') h+='<label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" data-btog="'+j+':readMore"'+(b.readMore!==false?' checked':'')+'> End with "'+TXT[lang].readMore+'" linking to the main link</label>';
+    } else if(t==='eyebrow'){
+      h+=field(base+'.'+lang+'.text','Small label (shown in spaced capitals)',40,'text',rtl,'VILLAS');
+    } else if(t==='rows'||t==='plan'){
+      h+=field(base+'.'+lang+'.title','Heading above the rows (optional)',50,'text',rtl,t==='plan'?'60/40 payment plan':'');
+      h+=field(base+'.'+lang+'.text',t==='plan'?'Plan rows':'Rows',0,'area',rtl,t==='plan'?'10% | On booking | Down payment\n50% | During construction | Six instalments\n40% | On handover | October 2030':'4-bedroom villa · 4,041 sq ft | AED 7.0M\n5-bedroom villa · 4,921 sq ft | AED 8.9M');
+      h+='<div class="hint">One row per line. Use | to split the columns: '+(t==='plan'?'value | title | note (note optional).':'label | value.')+'</div>';
+    } else if(t==='pair'){
+      h+='<div class="f"><label for="f-'+idk+'-style">Box style</label><select id="f-'+idk+'-style" data-path="'+base+'.style" style="width:auto"><option value="sp"'+(b.style!=='callout'?' selected':'')+'>Selling points (light blue boxes)</option><option value="callout"'+(b.style==='callout'?' selected':'')+'>Highlight boxes</option></select></div>';
+      h+=field(base+'.'+lang+'.a','Left box',0,'text',rtl,b.style==='callout'?'':'First line / second line');
+      h+=field(base+'.'+lang+'.b','Right box',0,'text',rtl,b.style==='callout'?'':'First line / second line');
+      if(b.style!=='callout') h+='<div class="hint">Use " / " to split a box into two lines. They stack on phones.</div>';
+    } else if(t==='break'){
+      h+='<div class="f"><label for="f-'+idk+'-bg">Next section sits on</label><select id="f-'+idk+'-bg" data-path="'+base+'.bg" style="width:auto"><option value="white"'+(b.bg!=='blue'?' selected':'')+'>A white card</option><option value="blue"'+(b.bg==='blue'?' selected':'')+'>The light blue background</option></select></div><div class="hint">Ends the current card and starts a new one below a gap, like the sections in the brochure template.</div>';
+    } else if(t==='list'){
+      h+=field(base+'.'+lang+'.title','List heading (optional)',50,'text',rtl,'Canyon Park');
+      h+=field(base+'.'+lang+'.text','List items',0,'area',rtl,'One item per line');
+    } else if(t==='button'){
+      h+=field(base+'.'+lang+'.label','Button label',22,'text',rtl);
+      h+='<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        '<div class="f" style="flex:1;min-width:150px"><label for="f-'+idk+'-link">Goes to</label><select id="f-'+idk+'-link" data-path="'+base+'.link"><option value="main"'+(!b.link||b.link==='main'?' selected':'')+'>Main link</option><option value="whatsapp"'+(b.link==='whatsapp'?' selected':'')+'>WhatsApp</option><option value="landing"'+(b.link==='landing'?' selected':'')+'>Landing page</option><option value="custom"'+(b.link==='custom'?' selected':'')+'>Other link</option></select></div>'+
+        '<div class="f" style="flex:1;min-width:150px"><label for="f-'+idk+'-style">Style</label><select id="f-'+idk+'-style" data-path="'+base+'.style"><option value="dark"'+(b.style!=='light'?' selected':'')+'>Dark (primary)</option><option value="light"'+(b.style==='light'?' selected':'')+'>Light (secondary)</option></select></div></div>';
+      if(b.link==='custom') h+='<div class="f"><label for="f-'+idk+'-url">Link</label><input type="url" id="f-'+idk+'-url" data-path="'+base+'.url" value="'+esc(b.url||'')+'" placeholder="https://"></div><div class="hint">Other links are used exactly as typed; add your own utm tags.</div>';
+      else h+='<div class="hint">WhatsApp and landing links use the same project link, ref and utm tags as the rest of the email. If one isn\'t set, the main link is used.</div>';
+    } else if(t==='buttons'){
+      h+='<div class="hint">Repeats this email\'s main button'+(resolveLinks(proj(),draft,acct,lang).both?' pair':'')+' here, with the same labels and links.</div>';
+    } else if(t==='spacer'){
+      h+='<div class="f"><label for="f-'+idk+'-size">Height</label><select id="f-'+idk+'-size" data-path="'+base+'.size" style="width:auto"><option value="small"'+(b.size==='small'?' selected':'')+'>Small</option><option value="medium"'+(!b.size||b.size==='medium'?' selected':'')+'>Medium</option><option value="large"'+(b.size==='large'?' selected':'')+'>Large</option></select></div>';
+    } else if(t==='image'){
+      h+='<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'+(b.previewUrl?'<img src="'+esc(b.previewUrl)+'" alt="" style="width:72px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--line)">':'')+
+        '<select data-path="'+base+'.shape" aria-label="Image width" style="width:auto"><option value="full"'+(b.shape!=='half'?' selected':'')+'>Full width</option><option value="half"'+(b.shape==='half'?' selected':'')+'>Half width (pairs)</option></select>'+
+        '<button type="button" class="btn small" data-tab="images">Upload and links in Images</button></div>';
+    }
+    h+='</div>';
+  });
+  h+='<div class="sec">Add a block</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+Object.entries(BLOCK_TYPES).map(([k,l])=>'<button type="button" class="btn small" data-addblock="'+k+'">+ '+esc(l)+'</button>').join('')+'</div>';
+  h+='<div class="hint">New blocks go above the '+(defaultSpot().includes('ending')?'ending headline':'buttons')+'. Change the position to move one. Half-width images next to each other in the same position sit side by side.</div>';
+  return h;
+}
+async function translateBlocks(){
+  if(!sample||busy)return; busy='blk'; renderEditor();
+  const bl=draft.blocks||[], want={};
+  bl.forEach((b,j)=>{['en','ar'].forEach(l=>{const o=l==='en'?'ar':'en';if(blockEmpty(b,l)&&!blockEmpty(b,o)){want[j]={type:b.type,from:o,to:l,source:b[o]}}})});
+  const prompt=RULES+'\n\nThese are extra blocks in a UAE property lead-generation email. For each block, write the missing language version of the source text. Arabic must read as natural, native marketing Arabic, not a word-for-word translation. Keep button labels under 22 characters. Keep list items one per line, and keep every | column separator and line break exactly where it is. Return the same keys as each source (text, label, title, a, b).\nBlocks: '+JSON.stringify(want)+'\n\n'+copyContext()+'\n\nReply with only JSON: {"<block index>":{"text":"...","title":"...","label":"...","a":"...","b":"..."}} with only the keys the source has.';
+  try{
+    const r=await sample.json(prompt,{modelTier:'default'});
+    Object.entries(r||{}).forEach(([j,v])=>{const w=want[j];if(!w||!v)return;['text','label','title','a','b'].forEach(k=>{if(typeof v[k]==='string'&&v[k])setPath(draft,'blocks.'+j+'.'+w.to+'.'+k,v[k])})});
+    toast('Written. Switch language to review before saving.');markDirty();
+  }catch(e){toast(aiErr(e))}
+  busy='';renderEditor();
+}
+async function writeAlt(keys){
+  if(!sample||busy)return; busy='alt'; renderEditor();
+  let done=0, fromCopy=0;
+  for(const key of keys){
+    const im=getPath(draft,key)||{}, slot=allSlots().find(s=>s.key===key)||{label:'image'};
+    let images; if(im.previewUrl){try{const r=await fetch(im.previewUrl);images=[await r.blob()]}catch(e){}}
+    if(!images&&!im.url&&!Object.values(im.urls||{}).some(Boolean)) continue;
+    const prompt='Write image alt text for a real-estate marketing email ('+slot.label+'). '+(images?'Describe what the attached image shows in one plain sentence, max 110 characters.':'You cannot see the image; write a neutral alt text from the email copy, max 90 characters, describing the likely scene (for example a villa exterior or a waterfront view) without claiming details.')+' Do not name the project or developer. No "image of". Also give the Arabic version written natively.\n\n'+copyContext()+'\n\nReply with only JSON: {"en":"","ar":""}';
+    try{
+      const r=await sample.json(prompt,images?{images,modelTier:'default'}:{modelTier:'quick'});
+      setPath(draft,key,Object.assign({},getPath(draft,key)||{},{altEn:(r||{}).en||'',altAr:(r||{}).ar||''}));
+      done++; if(!images)fromCopy++;
+    }catch(e){toast(aiErr(e));break}
+  }
+  if(done){markDirty();toast(done+' alt text'+(done>1?'s':'')+' written'+(fromCopy?' ('+fromCopy+' from the copy, not the picture)':'')+'.')}
+  else if(!document.querySelector('.toast:not([hidden])'))toast('Add an image file or URL first.');
+  busy='';renderEditor();
+}
+
+async function upload(key,file){
+  if(!file||!assets)return;
+  if(file.size>1024*1024) toast('That image is '+fmtKB(file.size)+'. Aim for under 300 KB per image.');
+  try{
+    const dims=await new Promise(r=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{r({w:im.naturalWidth,h:im.naturalHeight});URL.revokeObjectURL(u)};im.onerror=()=>r({});im.src=u});
+    const res=await assets.upload(file);
+    setPath(draft,key,Object.assign({},getPath(draft,key)||{},{previewId:res.id,previewUrl:res.url,sizeBytes:res.sizeBytes,fileName:file.name,w:dims.w,h:dims.h}));
+    markDirty();renderEditor();toast('Image uploaded');
+  }catch(err){toast('Upload failed: '+(err&&err.message||'try a smaller JPG or PNG'))}
+}
+async function save(){
+  if(!db||!draft)return;
+  const btn=$('#saveBtn');btn.disabled=true;btn.textContent='Saving…';
+  const rev=((cur()&&cur().data.rev)||0)+1, now=new Date().toISOString(), note=($('#saveNote')||{}).value||'';
+  const body=Object.assign(clone(draft),{rev,updatedAt:now,updatedBy:uid||null});
+  try{
+    await db.doc('templates/'+selId).set(body);
+    const snap=clone(body);delete snap.rev;delete snap.updatedAt;delete snap.updatedBy;
+    await db.collection('templates/'+selId+'/versions').doc('v'+String(rev).padStart(4,'0')).set({rev,savedAt:now,savedBy:uid||null,note,snapshot:snap});
+    dirty=false;remoteChanged=false;toast('Saved as version '+rev);
+  }catch(err){toast(err&&err.code==='permission_denied'?'You can view but not save. Ask the owner for edit access.':'Save failed. Check your connection and try again.');btn.disabled=false;btn.textContent='Save version';return}
+  renderEditor();renderList();
+}
+async function duplicate(){
+  if(!db||!draft)return;
+  const id=selId.replace(/-copy-.*$/,'')+'-copy-'+Date.now().toString(36);
+  const body=Object.assign(clone(draft),{title:draft.title+' (copy)',status:'Draft',sendDate:'',codeOverride:'',rev:1,updatedAt:new Date().toISOString(),updatedBy:uid||null});
+  try{await db.doc('templates/'+id).set(body);dirty=false;selId=id;tab='copy';toast('Copy created. Switch its layout to A/B test.')}catch(e){toast('Could not create the copy.')}
+}
+function subscribeVersions(){
+  if(unsubVers){unsubVers();unsubVers=null}versions=[];
+  if(!db||!selId)return;
+  unsubVers=db.collection('templates/'+selId+'/versions').orderBy('rev','desc').limit(30).onSnapshot(s=>{versions=s.docs.map(d=>Object.assign({id:d.id},d.data()));if(tab==='history')renderEditor()},()=>{});
+}
+
+/* ---------- preview ---------- */
+let pt;function schedulePreview(){clearTimeout(pt);pt=setTimeout(renderPreview,160)}
+function exportHtml(){return buildEmail(draft,proj(),lang,acct,'export')}
+function renderPreview(){
+  const f=$('#pv');
+  if(!draft){f.srcdoc='';$('#subj').innerHTML='';$('#meter').innerHTML='';$('#issues').innerHTML='';return}
+  const c=draft[lang]||{}, sp=subjectFor(draft,acct,lang), p=proj(), rt=lang==='ar'?' class="rtl" dir="rtl"':'';
+  $('#subj').innerHTML='<div><b>Subject</b><span'+rt+'>'+esc(sp.subject)+'</span><button type="button" class="btn small" data-copy="subject">Copy</button></div><div><b>Preview</b><span'+rt+'>'+esc(sp.preview)+'</span><button type="button" class="btn small" data-copy="preview">Copy</button></div>';
+  const html=exportHtml(), bytes=new TextEncoder().encode(html).length;
+  const slots=allSlots();
+  const imgBytes=slots.reduce((a,s)=>a+((imgUrlFor(s.im,acct)||s.im.previewUrl)&&s.im.sizeBytes||0),0);
+  const hp=Math.min(100,bytes/102400*100), ip=Math.min(100,imgBytes/(2*1048576)*100);
+  $('#meter').innerHTML='<div class="meta"><span>HTML <b class="mono">'+fmtKB(bytes)+'</b> of 102 KB Gmail limit</span><span>Images <b class="mono">'+fmtKB(imgBytes)+'</b> (aim under 1 MB)</span><span>Campaign <b class="mono">'+esc(campaignCode(p,draft))+'</b></span></div>'+
+    '<div class="bar" title="HTML size"><i class="'+(bytes>90000?'bad':bytes>60000?'warn':'')+'" style="width:'+hp+'%"></i></div><div class="bar" title="Image size"><i class="'+(imgBytes>2097152?'bad':imgBytes>1048576?'warn':'')+'" style="width:'+ip+'%"></i></div>';
+  const issues=[], lk=resolveLinks(p,draft,acct,lang);
+  if(!lk.L&&!lk.W) issues.push('No landing page or WhatsApp link set (Project settings), so links are empty.');
+  else if(!lk.both) issues.push('Only '+(lk.L?'the landing page':'WhatsApp')+' is set, so every link goes there.');
+  if(!draft.sendDate&&!draft.codeOverride) issues.push('No send date, so the campaign code ends in YYMMDD.');
+  slots.forEach(s=>{const im=s.im, nm=s.label.split(' · ')[0];const u=imgUrlFor(im,acct);
+    if(im.previewUrl&&!u)issues.push(nm+' has no '+acct+' link, so it is left out of this export.');
+    if(u&&!imgHostOk(u,acct)){const pl=(ACCOUNTS[acct]||{}).platform;issues.push(nm+' link for '+acct+' is not a '+pl+' image link. Use the link from '+pl+' to avoid spam filters.')}
+    if(im.sizeBytes>350*1024)issues.push(nm+' is '+fmtKB(im.sizeBytes)+'; compress it under 300 KB.');
+    if(u&&!im.altEn)issues.push(nm+' has no alt text.')});
+  if(!slots.some(s=>imgUrlFor(s.im,acct))) issues.push('No image links for '+acct+' yet; this export has no images.');
+  if(imgBytes>1048576) issues.push('Images total '+fmtKB(imgBytes)+'. Aim for under 1 MB so the email loads fast.');
+  const missingAcct=(draft.accounts||[]).filter(a=>a!==acct&&slots.some(s=>(s.im.previewUrl||Object.values(s.im.urls||{}).some(Boolean))&&!imgUrlFor(s.im,a)));
+  if(missingAcct.length) issues.push('Image links still missing for '+missingAcct.join(', ')+'.');
+  const miss=emptyFields(draft,lang); if(miss.length) issues.push(miss.length+' empty field'+(miss.length>1?'s':'')+' in this layout ('+miss.join(', ')+').');
+  const eb=(draft.blocks||[]).map((b,j)=>blockEmpty(b,lang)?j+1:0).filter(Boolean);
+  if(eb.length) issues.push('Block'+(eb.length>1?'s ':' ')+eb.join(', ')+' '+(eb.length>1?'are':'is')+' empty in '+(lang==='ar'?'Arabic':'English')+' and left out of this export (Blocks tab).');
+  (draft.blocks||[]).forEach((b,j)=>{if(b&&b.type==='button'){if(b.link==='custom'&&!/^https?:\/\//.test(b.url||''))issues.push('Block '+(j+1)+' button has no link.');if(String(((b[lang]||{}).label)||'').length>22)issues.push('Block '+(j+1)+' button label is long and may wrap on a phone.')}});
+  if((c.cta||'').length>22) issues.push('Main button label is long and may wrap on a phone.');
+  const accts=draft.accounts||[]; const subs=accts.map(a=>subjectFor(draft,a,lang).subject); if(new Set(subs).size<subs.length) issues.push('Some accounts share the same subject line (Subjects tab).');
+  const plat=(ACCOUNTS[acct]||{}).platform;
+  if(plat==='GetResponse'&&(!p.grCompany||!p.grAddress)) issues.push('GetResponse footer needs the company name and address (Project settings).');
+  if(!p.privacyUrl) issues.push('No privacy policy link set (Project settings).');
+  if(/\*/.test(JSON.stringify(c))&&!c.footnote) issues.push('An asterisked claim has no footnote.');
+  $('#issues').innerHTML=issues.length?issues.map(i=>'<div class="w">• '+esc(i)+'</div>').join(''):'<div class="ok">Ready to export for '+esc(acct)+' ('+esc(plat)+').</div>';
+  f.style.width=viewW+'px';
+  f.onload=()=>{try{f.style.height=(f.contentDocument.documentElement.scrollHeight+4)+'px'}catch(e){}};
+  f.srcdoc=buildEmail(draft,p,lang,acct,'preview');
+}
+$('#subj').addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(!b)return;const sp=subjectFor(draft,acct,lang);copyText(b.dataset.copy==='subject'?sp.subject:sp.preview)});
+function copyText(s,fallback){navigator.clipboard.writeText(s||'').then(()=>toast('Copied'),()=>{if(fallback)openCode();else toast('Copy is blocked here; select the text instead.')})}
+function fileName(){return campaignCode(proj(),draft)+'_'+(draft.angleId||'T').replace(/[^\w-]/g,'')+'_'+lay().short+'_'+lang.toUpperCase()+'_'+acct+'.html'}
+function openCode(){const h=exportHtml();$('#codeBox').value=h;$('#codeSize').textContent=fmtKB(new TextEncoder().encode(h).length)+' · '+fileName();$('#codeDlg').showModal();$('#codeBox').select()}
+$('#codeBtn').onclick=()=>draft&&openCode();
+$('#codeClose').onclick=()=>$('#codeDlg').close();
+$('#copyBtn').onclick=()=>draft&&copyText(exportHtml(),true);
+$('#dlBtn').onclick=async()=>{
+  if(!draft)return;
+  if(!downloads){openCode();toast('Downloads are not available here; copy the HTML instead.');return}
+  try{await downloads.save({filename:fileName(),data:exportHtml()})}catch(e){if(e&&e.code!=='declined')openCode()}
+};
+function syncSeg(){document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));document.querySelectorAll('[data-w]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.w===viewW))}
+document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{lang=b.dataset.lang;syncSeg();renderEditor();schedulePreview()});
+document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{viewW=+b.dataset.w;syncSeg();schedulePreview()});
+$('#acctSel').innerHTML=Object.entries(ACCOUNTS).map(([k,a])=>'<option value="'+k+'">'+k+' · '+a.platform+'</option>').join('');
+$('#acctSel').value=acct;$('#acctSel').onchange=e=>{acct=e.target.value;if(tab==='send')renderEditor();schedulePreview()};
+
+/* ---------- project settings ---------- */
+const PFIELDS=[
+  ['name','Project name (internal; available as {name})','text'],['code','Project code (P + 4 digits)','text'],
+  ['codePattern','Campaign code pattern','text','{project}-{date}'],
+  ['whatsappNumber','WhatsApp number with country code','tel','971543738134'],
+  ['waTextEn','WhatsApp message, English (the ref is added after it)','text','Please send me more details about Yas Riva Reserve'],
+  ['waTextAr','WhatsApp message, Arabic (for Arabic emails)','text','يرجى إرسال المزيد من التفاصيل عن ياس ريفا ريزيرف'],
+  ['waPattern','WhatsApp link pattern (advanced)','text',DEFAULT_WA],
+  ['waPatternAr','WhatsApp link pattern for Arabic emails (optional)','text','Leave empty to use the one above'],
+  ['cta2En','WhatsApp button label, English','text','Chat on WhatsApp'],['cta2Ar','WhatsApp button label, Arabic','text','تواصل عبر واتساب'],
+  ['privacyUrl','Privacy policy URL','url','https://…'],['grCompany','GetResponse footer: company name','text',''],['grAddress','GetResponse footer: company address','text','']];
+function renderProjSel(){const ids=Object.keys(projects);$('#projSel').innerHTML=ids.length?ids.map(id=>'<option value="'+esc(id)+'">'+esc(projects[id].name||id)+'</option>').join(''):'<option>No projects yet</option>';if(projId)$('#projSel').value=projId}
+$('#projSel').onchange=e=>{projId=e.target.value;selId=null;draft=null;renderList();renderEditor();renderPreview()};
+$('#projBtn').onclick=()=>{
+  const p=proj();
+  const val=k=>k==='cta2En'?((p.cta2||{}).en||''):k==='cta2Ar'?((p.cta2||{}).ar||''):(p[k]||'');
+  const lu=p.landingUrls||{}, t0=Object.assign({},draft||{},{useLanding:true});
+  const pre=a=>Object.prototype.hasOwnProperty.call(lu,a)?cleanLandingBase(lu[a]):(landingUrl(Object.assign({},p,{landingUrls:{}}),t0,a)||'').split('?')[0];
+  $('#projForm').innerHTML='<div class="sec" style="border-top:0;padding-top:0">Landing pages</div>'+
+    '<div class="hint">Paste each account\'s landing page when it\'s ready. A full link with utm tags is fine: the bank keeps the page address and adds the right utm tags for every email. If a pasted link carries a different utm_source from the account default, this project keeps the pasted utm_source for that account. Leave an account empty if it has no landing page; its links go to WhatsApp.</div>'+
+    '<div class="f"><label for="p-landingPath">Quick fill: same path on every account\'s domain</label><div style="display:flex;gap:6px"><input type="text" id="p-landingPath" data-k="landingPath" value="'+esc(p.landingPath||'')+'" placeholder="masaar-3" class="mono" style="font-size:12.5px"><button type="button" class="btn small" id="fillLanding">Fill</button></div></div>'+
+    Object.entries(ACCOUNTS).map(([a,ac])=>'<div class="f"><label for="lu-'+a+'"><span><b class="mono">'+a+'</b> · '+esc(ac.platform)+'</span><button type="button" class="btn small" data-luclear="'+a+'" style="padding:1px 8px">No landing page</button></label><input type="url" id="lu-'+a+'" data-lu="'+a+'" value="'+esc(pre(a))+'" placeholder="No landing page: links go to WhatsApp" class="mono" style="font-size:12.5px"><div class="link-out" data-luout="'+a+'" style="margin-top:4px"></div></div>').join('')+
+    '<div class="sec">WhatsApp</div><div class="f"><label>WhatsApp link this makes (GR1, English)</label><div class="link-out" id="waPreview"></div></div>'+PFIELDS.map(([k,l,t,ph])=>'<div class="f"'+(k==='cta2Ar'||k==='waTextAr'?' dir="rtl"':'')+'><label for="p-'+k+'">'+l+'</label><input type="'+t+'" id="p-'+k+'" data-k="'+k+'" value="'+esc(val(k))+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+(/Pattern/.test(k)?' class="mono" style="font-size:12px"':'')+'></div>').join('')+
+    '<div class="hint">Patterns fill these in per email: {message} the WhatsApp message above, {code} campaign code, {acct} account code (GR1), {source} account UTM source (GR-eliteresidences), {domain} account landing domain, {path} landing path, {number} WhatsApp number, {project} project code, {name} project name, {date} send date as YYMMDD, {layout} layout name. Paste your link with %20 for spaces, as it is in your platform.</div>';
+  updWaPreview();
+  $('#projDlg').showModal();
+};
+function readProjForm(){const body=Object.assign({},proj());document.querySelectorAll('#projForm [data-k]').forEach(i=>{const k=i.dataset.k,v=i.value.trim();if(k==='cta2En'||k==='cta2Ar'){body.cta2=Object.assign({},body.cta2||{},{[k==='cta2En'?'en':'ar']:v})}else body[k]=v});
+  const lus=document.querySelectorAll('#projForm [data-lu]');if(lus.length){body.landingUrls={};const ls=Object.assign({},body.landingSources||{});lus.forEach(i=>{const a=i.dataset.lu,raw=i.value.trim();body.landingUrls[a]=cleanLandingBase(raw);const m=raw.match(/[?&]utm_source=([^&#]+)/i);if(!raw)delete ls[a];else if(m){let v=m[1];try{v=decodeURIComponent(v)}catch(e){}if(v===(ACCOUNTS[a]||{}).source)delete ls[a];else ls[a]=v}});body.landingSources=ls}
+  return body}
+function updWaPreview(){const el=$('#waPreview');if(!el)return;const p=readProjForm();const t=Object.assign({},draft||{},{waTextEn:'',waTextAr:''});const u=waUrl(p,t,'GR1','en');let shown=u;try{shown=decodeURIComponent(u)}catch(e){}el.textContent=u?shown:'Add a WhatsApp number to build the link.';
+  const tl=Object.assign({},t,{useLanding:true});
+  document.querySelectorAll('#projForm [data-luout]').forEach(o=>{const l=landingUrl(p,tl,o.dataset.luout);o.innerHTML=l?esc(l):'<span class="muted">No landing page, links go to WhatsApp</span>'})}
+const AFIELDS=[['domain','Landing domain','projects.example.com'],['source','utm_source','GR-example']];
+$('#acctBtn').onclick=()=>{
+  $('#acctForm').innerHTML='<div class="hint">Each account sends from its own landing domain. Change a domain here and every project and template uses it. Untick "Has landing pages" for an account that should send WhatsApp links only.</div>'+
+    Object.entries(ACCOUNTS).map(([k,a])=>'<div class="acct"><div class="h"><b>'+k+'</b><span class="muted" style="font-size:12px">'+a.platform+'</span></div>'+
+      AFIELDS.map(([f,l,ph])=>'<div class="f"><label for="a-'+k+'-'+f+'">'+l+'</label><input type="text" id="a-'+k+'-'+f+'" data-a="'+k+'" data-f="'+f+'" value="'+esc(a[f]||'')+'" placeholder="'+ph+'" class="mono" style="font-size:12.5px"></div>').join('')+
+      '<div class="toggles"><label><input type="checkbox" data-a="'+k+'" data-f="landing"'+(a.landing!==false?' checked':'')+'> Has landing pages</label></div></div>').join('');
+  $('#acctDlg').showModal();
+};
+$('#acctCancel').onclick=()=>$('#acctDlg').close();
+$('#acctSave').onclick=async()=>{
+  if(!db)return;const accounts={};
+  document.querySelectorAll('#acctForm [data-a]').forEach(i=>{const k=i.dataset.a,f=i.dataset.f;accounts[k]=accounts[k]||{};accounts[k][f]=i.type==='checkbox'?i.checked:i.value.trim().replace(/^https?:\/\//,'').replace(/\/+$/,'')});
+  try{await db.doc('settings/accounts').set({accounts});$('#acctDlg').close();toast('Accounts saved')}catch(e){toast('Could not save accounts.')}
+};
+$('#projForm').addEventListener('input',updWaPreview);
+$('#projForm').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.luclear){const i=$('#lu-'+b.dataset.luclear);if(i){i.value='';updWaPreview()}return}
+  if(b.id==='fillLanding'){const path=($('#p-landingPath').value||'').trim().replace(/^\/+/,'');if(!path){toast('Type the path first, e.g. masaar-3');return}
+    let n=0;Object.entries(ACCOUNTS).forEach(([a,ac])=>{const i=$('#lu-'+a);if(!i||ac.landing===false||!ac.domain)return;i.value='https://'+ac.domain+'/'+path;n++});
+    updWaPreview();toast('Filled '+n+' account'+(n===1?'':'s')+'. Clear any that have no page yet.')}
+});
+$('#projForm').addEventListener('paste',e=>{const i=e.target;if(!i.dataset||!i.dataset.lu)return;setTimeout(()=>{i.value=cleanLandingBase(i.value);updWaPreview()},0)});
+$('#projCancel').onclick=()=>$('#projDlg').close();
+$('#projSave').onclick=async()=>{
+  if(!db||!projId)return;const body=readProjForm();
+  if(body.code&&!/^P\d{4}$/.test(body.code)){toast('Project code must be P plus 4 digits, e.g. P1004');return}
+  try{await db.doc('projects/'+projId).set(body);$('#projDlg').close();toast('Settings saved')}catch(e){toast('Could not save settings.')}
+};
+
+/* ---------- boot ---------- */
+(async()=>{
+  if(!window.claude||!claude.use){$('#conn').textContent='Could not start. Reload the page.';$('#list').innerHTML='<div class="empty">Templates load when this page is opened in Claude.</div>';return}
+  const timer=setTimeout(()=>{$('#conn').textContent='Still connecting. Templates may be out of date.'},10000);
+  db=await claude.use('db');
+  if(!db){clearTimeout(timer);$('#conn').textContent='Sign in to load templates.';$('#list').innerHTML='<div class="empty">Sign in to Claude to see the template bank.</div>';return}
+  claude.use('user').then(async u=>{if(u){try{uid=await u.id()}catch(e){}}});
+  claude.use('assets').then(a=>{assets=a;if(tab==='images')renderEditor()});
+  claude.use('downloads').then(d=>{downloads=d});
+  claude.use('sample').then(s=>{sample=s;if(draft)renderEditor()});
+  db.doc('settings/accounts').onSnapshot(d=>{applyAccountSettings(d.exists?d.data():null);if(draft){schedulePreview();if(tab==='send')renderEditor()}},()=>{});
+  db.collection('projects').onSnapshot(s=>{projects={};s.docs.forEach(d=>projects[d.id]=d.data());if(!projId||!projects[projId])projId=Object.keys(projects)[0]||null;renderProjSel();renderList();if(draft)schedulePreview()},()=>{});
+  db.collection('templates').onSnapshot(s=>{
+    if(!s.metadata.fromCache){clearTimeout(timer);$('#conn').textContent='Connected to your database.'}
+    templates=s.docs.map(d=>({id:d.id,data:d.data()}));
+    const c=cur();
+    if(c&&!dirty){const before=JSON.stringify(draft);draft=migrateDraft(clone(c.data));if(JSON.stringify(draft)!==before){renderEditor();schedulePreview()}}
+    else if(c&&dirty&&c.data.updatedAt&&c.data.updatedAt!==draft.updatedAt&&c.data.updatedBy!==uid){remoteChanged=true;renderEditor()}
+    if(!selId){const first=templates.filter(t=>t.data.project===projId&&t.data.status!=='Archived').sort((a,b)=>(a.data.sendDate||'9').localeCompare(b.data.sendDate||'9'))[0];if(first){select(first.id);return}}
+    renderList();
+  },e=>{clearTimeout(timer);$('#conn').textContent='Could not load templates ('+(e&&e.code||'error')+').'});
+})();
+</script>
+
+</body>
+</html>
